@@ -4,7 +4,10 @@ This project is an Inventory Catalog designed as a desktop application using Pyt
 
 ## Prerequisites
 
-Pip installation information
+To install all requirements for this project, run the following command
+```
+pip install -r requirements.txt
+```
 
 ## Getting Started
 
