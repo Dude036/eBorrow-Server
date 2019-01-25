@@ -26,7 +26,7 @@ def main():
 	global decode_buffer
 	HOST = '127.0.0.1'  # Standard loopback interface address (localhost)
 	PORT = 41111        # Port to listen on (non-privileged ports are > 1023)
-	data=''
+	data = ''
 
 	while True:
 		with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
@@ -55,16 +55,33 @@ def decoding():
 	while True:
 		item = decode_buffer.get()
 		print("Starting Decoding process.")
-		match = re.match(r'\<([0-9a-f]{32})\> (\{.*\})', item)
-		if match is not None:
-			# Add to the Database
-			print("Hash:", match.group(1))
-			# print(match.group(2))
-			pprint(json.loads(match.group(2)))
-		else:
-			# Add to the Error Queue
-			print("There was an Error processing the item:")
-			pprint(item)
+		print("Extracting User Information")
+
+		# Extract Username
+		username = item[:item.index(':')]
+		print("Username:", username)
+		item = item[item.index(':')+1:]
+
+		# Extract Key
+		user_key = item[:item.index(' ')]
+		print("key:", user_key)
+		item = item[item.index(' ')+1:]
+
+		# Extract Dictionary
+		print("Extracting Data")
+		matches = re.findall(r'\<([0-9a-f]{32})\> (\{[^\}]*\}[^\}]*\})', item)
+		# pprint(item, stream=open("data.log", 'w'))
+		# print(matches[0])
+		for match in matches:
+			if match:
+				# Add to the Database
+				print("Hash:", match[0])
+				# print(match.group(2))
+				pprint(json.loads(match[1]))
+			else:
+				# Add to the Error Queue
+				print("There was an Error processing the item:")
+				# pprint(item)
 
 
 if __name__ == '__main__':
