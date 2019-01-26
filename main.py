@@ -24,8 +24,9 @@ def recvall(sock):
 
 def main():
 	global decode_buffer
-	HOST = '127.0.0.1'  # Standard loopback interface address (localhost)
-	PORT = 41111        # Port to listen on (non-privileged ports are > 1023)
+	# HOST = '127.0.0.1'	# Localhost for testing
+	HOST = '192.168.1.166'	# Accepts outside traffic !!THIS NEEDS TO STAY!!
+	PORT = 41111		# Port to listen on (non-privileged ports are > 1023)
 	data = ''
 
 	while True:
