@@ -1,14 +1,21 @@
-# Archive (Working Title) - Server
+# eBorrow - Server
 
 This project is an Inventory Catalog designed as a desktop application using Python 3. This README is designed to assist in running the server and understanding it's processes.
 
 ## Prerequisites
 
-Pip installation information
+To install all requirements for this project, run the following command
+```
+pip install -r requirements.txt
+```
 
 ## Getting Started
 
-This repository contains the Server Application to be run headless.
+This repository contains the Server Application to be run headless. It is to be run completely autonomously. Backups and Running the application is up to the installer's discrestion.
+
+## Networking
+
+Coming Soon!
 
 ### Coding Style
 
@@ -37,12 +44,12 @@ We use GitHub's versioning system. The *master* branch is to remain untouched un
 10. Run styling script
 11. Submit Final Pull request for review
 
-## Authors
+## Authors (sorted alphabetically)
 
-* **Joshua Higham** - Role
-* **Caleb Lundquist** - Role
-* **Tim Weber** - Role
-* **Jordan Yates** - Role
+* **Joshua Higham** - Backend/Networking/Security/Database
+* **Caleb Lundquist** - Frontend/Networking
+* **Tim Weber** - Backend/Networking/Security
+* **Jordan Yates** - Frontend/GUI/Security
 
 ## License
 
