@@ -25,8 +25,8 @@ def recvall(sock):
 
 def main():
 	global decode_buffer
-	HOST = '127.0.0.1'	# Localhost for testing
-	# HOST = '172.31.38.104'	# AWS testing
+	# HOST = '127.0.0.1'	# Localhost for testing
+	HOST = '172.31.38.104'	# AWS testing
 	# HOST = '192.168.1.166'	# Accepts outside traffic !!THIS NEEDS TO STAY!!
 	PORT = 41111		# Port to listen on (non-privileged ports are > 1023)
 	data = ''
