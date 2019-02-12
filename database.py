@@ -34,12 +34,15 @@ def backup_libraries():
 
 def add_to_library(lib_item, user):
 	for file in os.listdir("."):
-		if file.endswith(".json") and user == file[:-5]:
+		if file.endswith(".json") and file[:-5] == user:
 			# Get the file information
 			stuff = json.load(open(file, 'r'))
 			# print(lib_item.keys(), lib_item.values())
 			stuff.update(lib_item)
-			json.dump(stuff, open(file, 'w'))
+			json.dump(stuff, open(file, 'w'), indent=2)
+		else:
+			# print(user, 'not found in library.')
+			pass
 
 
 def remove_from_library(lib_key, user):

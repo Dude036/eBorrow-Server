@@ -6,6 +6,7 @@ from pprint import pprint
 import re
 from multiprocessing import Process, Queue
 import time
+from database import add_to_library, remove_from_library, add_user, delete_user
 
 decode_buffer = Queue()
 
@@ -24,8 +25,8 @@ def recvall(sock):
 
 def main():
 	global decode_buffer
-	# HOST = '127.0.0.1'	# Localhost for testing
-	HOST = '172.31.38.104'	# AWS testing
+	HOST = '127.0.0.1'	# Localhost for testing
+	# HOST = '172.31.38.104'	# AWS testing
 	# HOST = '192.168.1.166'	# Accepts outside traffic !!THIS NEEDS TO STAY!!
 	PORT = 41111		# Port to listen on (non-privileged ports are > 1023)
 	data = ''
@@ -63,6 +64,7 @@ def decoding():
 		# Extract Username
 		username = item[:item.index(':')]
 		print("Username:", username)
+		username = username[1:]
 		item = item[item.index(':')+1:]
 
 		# Extract Key
@@ -80,7 +82,8 @@ def decoding():
 				# Add to the Database
 				print("Hash:", match[0])
 				# print(match.group(2))
-				pprint(json.loads(match[1]))
+				# pprint(json.loads(match[1]))
+				add_to_library({match[0]: json.loads(match[1])}, username)
 			else:
 				# Add to the Error Queue
 				print("There was an Error processing the item:")
