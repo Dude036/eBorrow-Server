@@ -25,8 +25,8 @@ def recvall(sock):
 
 def main():
 	global decode_buffer
-	# HOST = '127.0.0.1'	# Localhost for testing
-	HOST = '172.31.38.104'	# AWS testing
+	# HOST = '127.0.0.1'			# Localhost for testing
+	HOST = '172.31.38.104'		# AWS testing
 	# HOST = '192.168.1.166'	# Accepts outside traffic !!THIS NEEDS TO STAY!!
 	PORT = 41111		# Port to listen on (non-privileged ports are > 1023)
 	data = ''
@@ -50,44 +50,145 @@ def main():
 			print("Recieved:", "Length:", len(data))
 			# pprint(data)
 			# Send off to Decode
-			decode_buffer.put(data.decode())
+			decode_buffer.put([data.decode(), addr])
 			# pprint(decode_buffer)
+
+
+def read_key(item):
+	delimit = -1
+	for pos in range(len(item)-1):
+		if item[pos] == '|' and item[pos+1] == '|':
+			delimit = pos
+			break
+	return delimit
+
+
+def verify_key(username, key, public=True):
+	all_keys = json.load(open('keys.json'))
+	if username not in list(all_keys.keys()):
+		return False
+	elif public:
+		return all_keys[username]['public'] == key
+	else:
+		return all_keys[username]['private'] == key
+
+
+def find_user(username):
+	found = False
+	for file in os.listdir("."):
+		if file.endswith(".json") and user == file[:-5]:
+			found = True
+	return found
 
 
 def decoding():
 	global decode_buffer
 	while True:
-		item = decode_buffer.get()
+		# Wait for the Queue to be filled. Recieves the Item and the Address
+		item, addr = decode_buffer.get()
 		print("Starting Decoding process.")
 		print("Extracting User Information")
 
+		# Split the item into Header and Packet
+		header = None
+		packet = None
+		match = re.match(r'([^ ]*) (.*)', item)
+		if match is not None:
+			header = match.group(1)
+			packet = match.group(2)
+		else:
+			# Send Data to addr about the error
+			print("Dismissing invalid packet format")
+			print("Sending Error to:", addr)
+			continue
+
+		# Every command starts with the Username, It's easy to get that out of the way
 		# Extract Username
-		username = item[:item.index(':')]
-		print("Username:", username)
-		username = username[1:]
-		item = item[item.index(':')+1:]
-
-		# Extract Key
-		user_key = item[:item.index(' ')]
-		print("key:", user_key)
-		item = item[item.index(' ')+1:]
-
-		# Extract Dictionary
-		print("Extracting Data")
-		matches = re.findall(r'\<([0-9a-f]{32})\> (\{[^\}]*\}[^\}]*\})', item)
-		# pprint(item, stream=open("data.log", 'w'))
-		# print(matches[0])
-		for match in matches:
-			if match:
-				# Add to the Database
-				print("Hash:", match[0])
-				# print(match.group(2))
-				# pprint(json.loads(match[1]))
-				add_to_library({match[0]: json.loads(match[1])}, username)
+		delimit_pos = 0
+		for point in header:
+			if point == ':':
+				break
 			else:
-				# Add to the Error Queue
-				print("There was an Error processing the item:")
-				# pprint(item)
+				delimit_pos += 1
+
+		# No Delimiter = New User Application
+		if delimit_pos == 0:
+			add_user(header[1:])
+			continue
+
+		# Set Username
+		username = header[:delimit_pos]
+		print("Username:", username)
+		# Remove the '@' and remove username from the header
+		username = username[1:]
+		header = header[delimit_pos:]
+
+		# Get Packet ID number
+		match = re.match(r':(\d+):', header)
+		if match is not None:
+			packet_id = int(match.group(1))
+		else:
+			# Send Data to addr about the error
+			print("Dismissing: No packet ID")
+			print("Sending Error to:", addr)
+			continue
+		print('Processing Packet ID:', packet_id)
+		''' --- Interpretted Commands --- '''
+		if packet_id == 1:
+			# Delete User from Database
+			pass
+		elif packet_id == 2:
+			# Remove an Item from database
+			header = header[3:]
+			if verify_key(username, header, public=False):
+				sha_key = packet[1:33]
+				res = remove_from_library(sha_key, username)
+				if not res:
+					print("Key not found in Library")
+					print("Sending Error to:", addr)
+					continue
+			else:
+				print("Dismissing: incorrect key Value pair")
+				print("Sending Error to:", addr)
+				continue
+
+		elif packet_id == 3:
+			# Add an Item to database
+			# Remove the Header information
+			header = header[3:]
+			# print(header)
+			if verify_key(username, header, public=False):
+				# add_to_library(username, key)
+				sha_key = packet[1:33]
+				value = packet[34:]
+				add_to_library({sha_key: json.loads(value)}, username)
+			else:
+				print("Dismissing: incorrect key Value pair")
+				print("Sending Error to:", addr)
+				continue
+
+		elif packet_id == 4:
+			# Send all the Users' Data to the user
+			pass
+		elif packet_id == 5:
+			# send specific Data tp the User
+			pass
+		elif packet_id == 6:
+			# Update Item Ownership
+			pass
+		# ''' --- PIPED COMMADS --- '''
+		elif packet_id == 100:
+			# the database
+			pass
+		elif packet_id == 101:
+			# Remove an Item from the database
+			pass
+		else:
+			# Unrecognised Packet ID
+			print("Dismissing: Unrecognised packet ID")
+			print("Sending Error to:", addr)
+			continue
+
 
 
 if __name__ == '__main__':

@@ -2,6 +2,7 @@
 
 import os
 import simplejson as json
+from pprint import pprint
 
 def backup_libraries():
 	# Make sure the backup directory is there
@@ -30,7 +31,7 @@ def backup_libraries():
 		else:
 			print("The file does not exist")
 			pass
-
+ 
 
 def add_to_library(lib_item, user):
 	for file in os.listdir("."):
@@ -39,7 +40,7 @@ def add_to_library(lib_item, user):
 			stuff = json.load(open(file, 'r'))
 			# print(lib_item.keys(), lib_item.values())
 			stuff.update(lib_item)
-			json.dump(stuff, open(file, 'w'), indent=2)
+			json.dump(stuff, open(file, 'w'))
 		else:
 			# print(user, 'not found in library.')
 			pass
@@ -48,11 +49,16 @@ def add_to_library(lib_item, user):
 def remove_from_library(lib_key, user):
 	for file in os.listdir("."):
 		if file.endswith(".json") and user == file[:-5]:
+			# print(file)
 			stuff = json.load(open(file, 'r'))
-			stuff.pop(lib_key)
-			# print(stuff)
-			json.dump(stuff, open(file, 'w'))
-
+			if lib_key in list(stuff.keys()):
+				stuff.pop(lib_key)
+				# print(stuff)
+				json.dump(stuff, open(file, 'w'))
+				return True
+			else:
+				print("\t\tKey not found")
+				return False
 
 def add_user(name):
 	json.dump({}, open(name + '.json', 'w'))
