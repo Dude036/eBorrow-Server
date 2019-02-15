@@ -6,9 +6,10 @@ from pprint import pprint
 import re
 from multiprocessing import Process, Queue
 import time
-from database import add_to_library, remove_from_library, add_user, delete_user
+from database import add_to_library, remove_from_library, add_user, delete_user, find_user, ownership_change
 
 decode_buffer = Queue()
+error_buffer = Queue()
 
 def recvall(sock):
 	''' Recieves all the data in the network buffer	'''
@@ -25,8 +26,8 @@ def recvall(sock):
 
 def main():
 	global decode_buffer
-	# HOST = '127.0.0.1'			# Localhost for testing
-	HOST = '172.31.38.104'		# AWS testing
+	HOST = '127.0.0.1'			# Localhost for testing
+	# HOST = '172.31.38.104'		# AWS testing
 	# HOST = '192.168.1.166'	# Accepts outside traffic !!THIS NEEDS TO STAY!!
 	PORT = 41111		# Port to listen on (non-privileged ports are > 1023)
 	data = ''
@@ -64,7 +65,7 @@ def read_key(item):
 
 
 def verify_key(username, key, public=True):
-	all_keys = json.load(open('keys.json'))
+	all_keys = json.load(open('keys.db'))
 	if username not in list(all_keys.keys()):
 		return False
 	elif public:
@@ -73,16 +74,8 @@ def verify_key(username, key, public=True):
 		return all_keys[username]['private'] == key
 
 
-def find_user(username):
-	found = False
-	for file in os.listdir("."):
-		if file.endswith(".json") and user == file[:-5]:
-			found = True
-	return found
-
-
 def decoding():
-	global decode_buffer
+	global decode_buffer, error_buffer
 	while True:
 		# Wait for the Queue to be filled. Recieves the Item and the Address
 		item, addr = decode_buffer.get()
@@ -98,7 +91,7 @@ def decoding():
 			packet = match.group(2)
 		else:
 			# Send Data to addr about the error
-			print("Dismissing invalid packet format")
+			print("Dismissing: Invalid header format")
 			print("Sending Error to:", addr)
 			continue
 
@@ -111,9 +104,11 @@ def decoding():
 			else:
 				delimit_pos += 1
 
-		# No Delimiter = New User Application
+		# No Delimiter = Error in the Header
 		if delimit_pos == 0:
-			add_user(header[1:])
+			# Send Data to addr about the error
+			print("Dismissing: Invalid header format")
+			print("Sending Error to:", addr)
 			continue
 
 		# Set Username
@@ -134,9 +129,28 @@ def decoding():
 			continue
 		print('Processing Packet ID:', packet_id)
 		''' --- Interpretted Commands --- '''
-		if packet_id == 1:
+		if packet_id == 0:
+			# New User Application
+			packet = json.loads(packet)
+			secret_key = packet['private']
+			public_key = packet['public']
+			add_user(username, secret_key, public_key)
+		elif packet_id == 1:
 			# Delete User from Database
-			pass
+			packet = json.loads(packet)
+			secret_key = header[3:]
+			public_key = packet["public"]
+			if packet["Delete"] == 1:
+				if verify_key(username, secret_key, public=False):
+					if verify_key(username, public_key, public=True):
+						delete_user(username)
+					else:
+						print("Incorrect Public Key")
+				else:
+					print("Incorrect Private Key")
+			else:
+				print("Unspecified Deletion command")
+
 		elif packet_id == 2:
 			# Remove an Item from database
 			header = header[3:]
@@ -171,11 +185,19 @@ def decoding():
 			# Send all the Users' Data to the user
 			pass
 		elif packet_id == 5:
-			# send specific Data tp the User
+			# send specific Data to the User
 			pass
 		elif packet_id == 6:
 			# Update Item Ownership
-			pass
+			if verify_key(username, header[3:], public=False):
+				item_key = packet[1:33]
+				json_data = json.loads(packet[34:])
+				if verify_key(json_data['New Owner'], json_data['Public Key'], public=True):
+					ownership_change(item_key, username, json_data['New Owner'])
+				else:
+					print("Invalid Public Key")
+			else:
+				print('Invalid Private key')
 		# ''' --- PIPED COMMADS --- '''
 		elif packet_id == 100:
 			# the database
@@ -192,12 +214,18 @@ def decoding():
 
 
 if __name__ == '__main__':
-	runnables = [Process(target=main), Process(target=decoding)]
+	# Set three infinite running tasks. 
+	# 1) Listen on the network for data
+	# 2) Listen on the Decoding Queue to interpret data
+	# 3) Listen on the Error Queue to send return messages
+	runnables = [Process(target=main), Process(target=decoding)] #, Process(target=error)]
 
+	# Run the tasks
 	for r in runnables:
 		print("Beginning:", str(r))
 		r.start()
 
+	# End the tasks. Since the above is infinite, this will never reach unless all thread have an unexpected error
 	for r in runnables:
 		r.join()
 		print("Ended:", str(r))
