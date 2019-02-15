@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
 import simplejson as json
+from ast import literal_eval
 import socket
 from pprint import pprint
 import re
@@ -13,7 +14,7 @@ error_buffer = Queue()
 
 def recvall(sock):
 	''' Recieves all the data in the network buffer	'''
-	BUFF_SIZE = 1024
+	BUFF_SIZE = 4096
 	data = b''
 	while True:
 		part = sock.recv(BUFF_SIZE)
@@ -26,8 +27,8 @@ def recvall(sock):
 
 def main():
 	global decode_buffer
-	# HOST = '127.0.0.1'			# Localhost for testing
-	HOST = '172.31.38.104'		# AWS testing
+	HOST = '127.0.0.1'			# Localhost for testing
+	# HOST = '172.31.38.104'		# AWS testing
 	# HOST = '192.168.1.166'	# Accepts outside traffic !!THIS NEEDS TO STAY!!
 	PORT = 41111		# Port to listen on (non-privileged ports are > 1023)
 	data = ''
@@ -131,13 +132,13 @@ def decoding():
 		''' --- Interpretted Commands --- '''
 		if packet_id == 0:
 			# New User Application
-			packet = json.loads(packet)
+			packet = literal_eval(packet)
 			secret_key = packet['private']
 			public_key = packet['public']
 			add_user(username, secret_key, public_key)
 		elif packet_id == 1:
 			# Delete User from Database
-			packet = json.loads(packet)
+			packet = literal_eval(packet)
 			secret_key = header[3:]
 			public_key = packet["public"]
 			if packet["Delete"] == 1:

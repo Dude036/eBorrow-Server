@@ -49,7 +49,7 @@ def test_send_buffer(send_buffer):
 			s.connect((HOST, PORT))
 			s.sendall(thing.encode())
 		print("Sent:", re.match(r'(\@[\S]+)\:(\d+)\:', thing).groups())
-		time.sleep(.2)
+		time.sleep(.5)
 
 
 def generate_private_public_keypair():
@@ -102,11 +102,11 @@ if __name__ == '__main__':
 	test_create_new_user(test_username_1, private_key_1, public_key_1)
 	test_create_new_user(test_username_2, private_key_2, public_key_2)
 	input(format("Press Enter to Continue", '^100s'))
-	
+
 	# Add all items to user 1
 	test_add_db_item(test_username_1, private_key_1)
 	input(format("Press Enter to Continue", '^100s'))
-	
+
 	owned_item = choice([{key: value} for key, value in Items.items()])
 
 	# Transer to username
@@ -120,6 +120,6 @@ if __name__ == '__main__':
 	# Remove Items
 	test_delete_db_item(test_username_1, private_key_1)
 	input(format("Press Enter to Continue", '^100s'))
-	
+
 	test_delete_new_user(test_username_1, private_key_1, public_key_1)
 	test_delete_new_user(test_username_2, private_key_2, public_key_2)
