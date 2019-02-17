@@ -7,8 +7,10 @@ import time
 from Crypto.PublicKey import RSA
 from numpy.random import randint, choice
 from OpenSSL import crypto
+import hashlib
 
 HOST = '127.0.0.1'			# Local Host Testing
+# HOST = '3.90.142.252'			# AWS Testing
 PORT = 41111				# The port used by the server
 
 Items = json.load(open("db.json", 'r'))
@@ -40,16 +42,16 @@ def test_delete_db_item(username, private_key):
 	test_send_buffer(send_buffer)
 
 
-
-def test_send_buffer(send_buffer):
+def test_send_buffer(send_buffer, end_byte=''):
 	for thing in send_buffer:
 		# Send Buffer
 		with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
 			s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 			s.connect((HOST, PORT))
-			s.sendall(thing.encode())
+			s.sendall(thing.encode() + end_byte.encode())
+			s.close()
 		print("Sent:", re.match(r'(\@[\S]+)\:(\d+)\:', thing).groups())
-		time.sleep(.5)
+		time.sleep(.2)
 
 
 def generate_private_public_keypair():
@@ -73,13 +75,13 @@ def generate_private_public_keypair():
 
 def test_create_new_user(username, private_key, public_key):
 	header = '@' + username + ':0:'
-	packet = '{"private":"' + private_key.decode() + '", "public":"' + public_key.decode() + '"}'
+	packet = "{\"private\":\"" + private_key.decode() + "\", \"public\":\"" + public_key.decode() + "\"}"
 	test_send_buffer([header + ' ' + packet])
 
 
 def test_delete_new_user(username, private_key, public_key):
 	header = '@' + username + ':1:' + private_key.decode()
-	packet = '{"Delete":1, "public":"' + public_key.decode() + '"}'
+	packet = "{\"Delete\":1, \"public\":\"" + public_key.decode() + "\"}"
 	test_send_buffer([header + ' ' + packet])
 
 
@@ -92,8 +94,17 @@ def test_ownership_change(username, private_key, item, friend_username, friend_p
 
 if __name__ == '__main__':
 	print("Generating Key Pairs")
-	private_key_1, public_key_1 = generate_private_public_keypair()
-	private_key_2, public_key_2 = generate_private_public_keypair()
+	if False:
+		full_private_key_1, full_public_key_1 = generate_private_public_keypair()
+		full_private_key_2, full_public_key_2 = generate_private_public_keypair()
+
+		private_key_1 = hashlib.sha224(full_private_key_1).hexdigest().encode()
+		public_key_1 = hashlib.sha224(full_private_key_1).hexdigest().encode()
+		private_key_2 = hashlib.sha224(full_private_key_1).hexdigest().encode()
+		public_key_2 = hashlib.sha224(full_private_key_1).hexdigest().encode()
+	else:
+		private_key_1, public_key_1 = generate_private_public_keypair()
+		private_key_2, public_key_2 = generate_private_public_keypair()
 
 	test_username_1 = 'username_1'
 	test_username_2 = 'username_2'

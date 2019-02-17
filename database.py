@@ -49,6 +49,20 @@ def find_user(username):
 	return found
 
 
+''' auto_backup()
+Automatically calls backup at some specified interval. Currently, setup to check every minute and backup every 10 minutes
+'''
+def auto_backup():
+	from time import sleep
+	from datetime import datetime
+	start = datetime.utcnow().minute
+	backup_interval = 10
+	while True:
+		if datetime.utcnow().minute % backup_interval == 0:
+			backup_libraries()
+		sleep(60)
+
+
 ''' backup_libraries()
 Backs up the database into a folder called backups
 '''

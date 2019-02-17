@@ -7,18 +7,45 @@ from pprint import pprint
 import re
 from multiprocessing import Process, Queue
 import time
-from database import add_to_library, remove_from_library, add_user, delete_user, find_user, ownership_change
-
+from database import add_to_library, remove_from_library, add_user, delete_user, find_user, ownership_change, auto_backup
+from errors import error_buffer, error_handler
 decode_buffer = Queue()
-error_buffer = Queue()
+
+
+''' recv_until
+Read in data until a certian byte is recieved.
+sock: socket object: the socket to recieve data on.
+'''
+def recv_until(sock):
+	END_BYTE = '||'
+	total_data=[]
+	data=b''
+	while True:
+		data=sock.recv(8192)
+		if END_BYTE in data:
+			total_data.append(data[:data.find(END_BYTE)])
+			break
+		total_data.append(data)
+		if len(total_data)>1:
+			#check if end_of_data was split
+			last_pair=total_data[-2]+total_data[-1]
+			if END_BYTE in last_pair:
+				total_data[-2]=last_pair[:last_pair.find(END_BYTE)]
+				total_data.pop()
+				break
+	return ''.join(total_data)
+
 
 def recvall(sock):
 	''' Recieves all the data in the network buffer	'''
 	BUFF_SIZE = 4096
 	data = b''
+	chunk_byte = 0
 	while True:
 		part = sock.recv(BUFF_SIZE)
 		data += part
+		print(chunk_byte, '\n', part)
+		chunk_byte += 1
 		if len(part) < BUFF_SIZE:
 			# either 0 or end of data
 			break
@@ -44,7 +71,8 @@ def main():
 			with conn:
 				print('Connected by', addr)
 				try:
-					data = recvall(conn)
+					data = recvall(conn).decode()
+					# data = recv_until(conn)
 				except Exception as e:
 					print(type(e))
 					print(e.args)
@@ -52,7 +80,7 @@ def main():
 			print("Recieved:", "Length:", len(data))
 			# pprint(data)
 			# Send off to Decode
-			decode_buffer.put([data.decode(), addr])
+			decode_buffer.put([data, addr])
 			# pprint(decode_buffer)
 
 
@@ -94,6 +122,7 @@ def decoding():
 			# Send Data to addr about the error
 			print("Dismissing: Invalid header format")
 			print("Sending Error to:", addr)
+			error_buffer.put([])
 			continue
 
 		# Every command starts with the Username, It's easy to get that out of the way
@@ -154,8 +183,7 @@ def decoding():
 
 		elif packet_id == 2:
 			# Remove an Item from database
-			header = header[3:]
-			if verify_key(username, header, public=False):
+			if verify_key(username, header[3:], public=False):
 				sha_key = packet[1:33]
 				res = remove_from_library(sha_key, username)
 				if not res:
@@ -169,10 +197,8 @@ def decoding():
 
 		elif packet_id == 3:
 			# Add an Item to database
-			# Remove the Header information
-			header = header[3:]
 			# print(header)
-			if verify_key(username, header, public=False):
+			if verify_key(username, header[3:], public=False):
 				# add_to_library(username, key)
 				sha_key = packet[1:33]
 				value = packet[34:]
@@ -219,7 +245,8 @@ if __name__ == '__main__':
 	# 1) Listen on the network for data
 	# 2) Listen on the Decoding Queue to interpret data
 	# 3) Listen on the Error Queue to send return messages
-	runnables = [Process(target=main), Process(target=decoding)] #, Process(target=error)]
+	# 4) Scheduled backups
+	runnables = [Process(target=main), Process(target=decoding), Process(target=error_handler), Process(target=auto_backup)]
 
 	# Run the tasks
 	for r in runnables:

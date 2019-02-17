@@ -184,3 +184,9 @@ The Type Info varies based on the category and the sub category. So far, we've i
 
 	The key the user is using, is not found in the database
 
+### Error Code Packet Protocol
+
+	Header:
+		<Error>
+	Packet:
+		{"Description": "The Description Information (see above)", "Id": "Error Code Number"}
