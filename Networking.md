@@ -4,11 +4,11 @@ Below are listed the structure of packets sent and recieved for this server.
 
 ## Packet structures
 
-Each packet sent to the database will be either interpretted or piped. Each packet sent will recieve a reply with a code. These code and structured are listed below.
+Each packet sent to the database will be either interpretted or piped. Each packet sent will recieve a reply with a code. These codes and structures are listed below.
 
 ### Base Structure
 
-The Header and the Packet are separated by the space character, " ". Since we are using AES encryption keys, "||" will be used as the delimiter to prevent key mismatch and key separation. 
+The Header and the Packet are separated by the space character, " ". At the end of every packet, attach the terminator byte string, "0x7FFF7FFF". Not having this at the end of your transmission, will be interpretted as an incomplete transmission, and will be ignored.
 
 ### Server Received Command Structure
 
@@ -16,89 +16,148 @@ Every header follows a similar structure of having the username and the packet i
 
 #### Interpreted Commands
 
-These are interpreted commands that edits the database in some manner or form. Therefore, they are slower in execution. These commands packet identifier range from an number between 0 and 99.
+These are interpreted commands that edits the database in some manner or form. Therefore, they are slower in execution. These command packet identifiers range from any number between 0 and 99.
 
 * Create New User
 
 		Header:
-			@username:0:
+			@username:0
 		Packet:
 			{"Private": Private_key, "Public":Public_key}
 
 * Delete Existing User
 
 		Header:
-			@username:1:Private_key
+			@username:1
 		Packet:
-			{"Delete": 1, "Public":Public_key}
+			{"Delete": 1, "Public":Public_key, "Private":Private_key}
 
 * Remove an item from the database
 
 		Header:
-			@username:2:Private_key
+			@username:2
 		Packet:
-			<SHA_256 Hash of item>
+			{"Key":SHA_256 Hash of item, "Private":Private_key}
 
 * Add an item to database
 	
 		Header:
-			@username:3:Private_key
+			@username:3
 		Packet:
-			<SHA_256 Hash of item>{json data}
+			{"SHA_256 Hash of item":{json data}, "Private":Private_key}
+
+
+**NOTE**: This can be used to retrieve many items from the database, simply add more key, value pairs to the json object. There need only be one "Private" key.
+
 
 * Send All Data
 
 		Header:
-			@username:4:Public_key
+			@username:4
 		Packet:
-			{"Library": 1, "IP": "User's IP address"}
+			{"Public":Public_key}
 
 * Send Specific Data
 
 		Header:
-			@username:5:Public_key
+			@username:5
 		Packet:
-			{"SHA_256 Hash of item": 1, "IP": "User's IP address"}
+			{"SHA_256 Hash of item": 1, "Public":Public_key}
 
 * Item Current Ownership Update
-	
+
 		Header:
-			@username:6:Private_key
-		Packet
-			<SHA_256 Hash of item>{"New Owner": "friend_username", "Public Key": "Friends_public_key}
+			@username:6
+		Packet:
+            {
+                "SHA_256 Hash of item": 1, 
+                "New Owner": "friend_username",
+                "Public": "Friends_Public_key",
+                "Private": "Username_Private_key",
+                "Schedule": {
+                    "In": [Day, Month, Year],
+                    "Out": [Day, Month, Year],
+                }
+            }
+
+**NOTE**: This is the creation of an exchange item. This will be modified at runtime according to their owners databases. I.e. the Current Owner of the item will be separate from the Permanent owner until the specified out schedule in the Permanent owner's database. 
 
 
 #### Piped Commands
 
 These commands are only read by the server, and are stored in a buffer. Whenever the target user connects with the database, the command is then sent. All piped commands have a packet identifier between 100 and 199.
 
-* Acquisition Request
+* Aquisition (Exchange) Request
 	
 		Header:
-			@username:100:Private_key||@friend_username:Public_key||
+			@username:100
 		Packet:
-			{json data}
+			{
+			    "SHA_256 Hash of item": 1,
+			    "Borrower": {
+			        "Public": "Public_key",
+			        "Username": "your_username",
+			    }
+			    "Lender": {
+			        "Public": "Public_key",
+			        "Username": "friends_username",
+			    }
+			 }
 
-* Add \ Confirm Friend
+* Friend Request
 
 		Header:
-			@personal_username:101:Personal_private_key
+			@your_username:101
 		Packet:
-			[@friendly_username:Personal_Public_key||]
+			{"Target": "friends_username"}
+			
+			
+* Add Friend
 
+        Header:
+            @username:102
+        Packet:
+            {
+                "Target": "friends_username"
+                "Key": Your_Public_key
+            }
+
+* Delete Friend
+    
+		Header:
+			@your_username:103
+		Packet:
+			{"Target": "friends_username"}
 
 
 ### Server Transmit Command Structure
 
 These are commands that are sent, per request from a user, to the connected IP address. All commands following this structure have an identifier between 200 and 299. 
 
+**NOTE**: These commands will send a multiple of objects, if requested.
+
 * Send Item:		
 
 		Header:
-			@username:200:Private_key
+			@username:200
 		Packet:
-			<SHA_256 Hash of item>{json data}
+			{"SHA_256 Hash of item":{json data}, "SHA_256 Hash of item":{json data}, ... }
 
+
+* Send Messages:
+
+		Header:
+			@username:201
+		Packet:
+			["Message", "Message", ... ]
+
+
+* Send Exchanges:		
+
+		Header:
+			@username:202
+		Packet:
+			[{Exchange Object}, {Exchange Object}, ... ]
 
 ### Database Item Stucture
 
@@ -166,7 +225,7 @@ The Type Info varies based on the category and the sub category. So far, we've i
 
 *These are still be actively worked on and implimented*
 
-0. No error. Successful Execution
+0. No error, Successful Execution
 
 1. Invalid Packet Format
 
@@ -174,19 +233,79 @@ The Type Info varies based on the category and the sub category. So far, we've i
 	
 	i.e.: Missing parenthesis, No space between Header and Packet, Incorrect Json format
 
-2. Invalid Packet ID
+2. Invalid Header ID
 
-	The Packet that you sent was not recognized as a valid packet.
-	
-	i.e.: Wrong Key words and Identifiers
+	Header ID out of range or not used
 
-3. Invalid User Key
+3. User Key Not Found
 
 	The key the user is using, is not found in the database
+
+4. Invalid User Public Key
+
+	The hash of the public key didn't validate. Cannot proceed
+
+5. Invalid User Private Key
+
+	The hash of the private key didn't validate. Cannot proceed
+
+6. Invalid Header Format
+
+	Header has an invalid format
+
+7. Invalid Packet Format
+
+	Packet has an invalid format
+
+8. Unspecified Deletion Key
+
+	Tried to delete something that doesn't exist.
+
+	This may be due to an error while updating
+
+9. Key not found in User Database
+
+	Unable to find the key in the database
+
+10. Incorrect Key hash
+
+	The checked hash doesn't match the hash given
+
+11. Missing Private Key
+
+	Lacking a Private Key
+
+12. Missing Public Key
+
+	Lacking a Private Key
+
+13. Illegal Character
+
+	You tried to write a character not in the UTF-8 Character set. Cannot write it
+
+14. Unable to Write to Database
+
+	There was an error in writing your database. Please try again.
+
+15. Unable to Read Database
+
+	There was an error in reading your database. Please try again.
+
+16. Username already exists
+
+17. Username not found
+
+18. Unterminated Transmission Buffer Received
+
+	You sent a packet without terminating. Timed out.
+
+99. Unknown Error Occurred. Unable to resolve error
+
+	Something happened. I have no idea what. I can't solve this.
 
 ### Error Code Packet Protocol
 
 	Header:
-		<Error>
+		!Error:Id
 	Packet:
-		{"Description": "The Description Information (see above)", "Id": "Error Code Number"}
+		{"Description": "The Description Information (see above)"}
