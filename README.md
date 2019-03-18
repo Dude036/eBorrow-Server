@@ -15,7 +15,7 @@ This repository contains the Server Application to be run headless. It is to be 
 
 ## Networking
 
-Coming Soon!
+See [Networking](Networking.md)
 
 ### Coding Style
 
