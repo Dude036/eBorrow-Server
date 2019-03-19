@@ -143,12 +143,21 @@ def interpretted(username, packet_id, packet, addr, error_buffer, transmit_buffe
                 print("User not found in the database")
                 error_buffer.put([17, addr])
                 return
-            user.remove_from_inventory(packet['Key'])
+            if isinstance(packet['Key'], str):
+                if not user.remove_from_inventory(packet['Key']):
+                    print("Key not found in Library")
+                    print("Sending Error to:", addr)
+                    error_buffer.put([8, addr])
+            elif isinstance(packet['Key'], list):
+                for item in packet['Key']:
+                    if not user.remove_from_inventory(item):
+                        print("Key not found in Library")
+                        print("Sending Error to:", addr)
+                        error_buffer.put([8, addr])
+            else:
+                print("Value not acceptable data type")
+                error_buffer.put([20, addr])
             user.to_file()
-            if not user.remove_from_inventory(packet['Key']):
-                print("Key not found in Library")
-                print("Sending Error to:", addr)
-                error_buffer.put([8, addr])
         else:
             print("Incorrect private Key")
             error_buffer.put([3, addr])

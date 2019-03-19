@@ -53,6 +53,18 @@ def test_delete_db_item(username, private_key):
     test_send_buffer(send_buffer)
 
 
+def test_delete_many_db_item(username, private_key):
+    header = '@' + username + ':2'
+    packet = '{"Key":['
+    for key, value in Items.items():
+        packet += '"' + key + '",'
+    # Remove the last comma from the packet
+    packet = packet[:-1]
+    packet += '], "private": "' + private_key.decode() + '"}'
+
+    test_send_buffer([header + ' ' + packet])
+
+
 def test_add_db_item(username, private_key):
     send_buffer = []
 
@@ -128,7 +140,7 @@ if __name__ == '__main__':
     input(format("Press Enter to Continue", '^100s'))
 
     # Remove Items
-    test_delete_db_item(test_username_1, private_key_1)
+    test_delete_many_db_item(test_username_1, private_key_1)
     input(format("Press Enter to Continue", '^100s'))
 
     test_delete_new_user(test_username_1, private_key_1, public_key_1)

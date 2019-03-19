@@ -22,6 +22,7 @@ ERROR_CODES = {
     17: 'Username not found',
     18: 'Unterminated Transmission Buffer Received',
     19: 'Invalid JSON',
+    20: 'Invalid Data type received',
     99: 'Unknown Error Occurred. Unable to resolve error'
 }
 

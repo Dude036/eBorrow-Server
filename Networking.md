@@ -37,7 +37,9 @@ These are interpreted commands that edits the database in some manner or form. T
 		Header:
 			@username:2
 		Packet:
-			{"Key":SHA_256 Hash of item, "private":Private_key}
+			{"Key":[SHA_256 Hash of item], "private":Private_key}
+
+**NOTE**: The Key should be a list of items to remove. This can be a list of any size.
 
 * Add an item to database
 	
