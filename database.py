@@ -2,6 +2,31 @@
 
 import os
 import simplejson as json
+from User import User
+import hashlib
+
+
+def retrieve_user(username):
+    """
+    A function to return a database from a username
+    :param username: a string of a username to retrieve
+    :return: If user exists in the database:
+                A user object
+             Else:
+                None
+    """
+    database = None
+    if username.endswith(".json"):
+        username = username[:-5]
+
+    try:
+        if find_user(username):
+            file = os.path.join('db', username + '.json')
+            database = User(username, json_data=json.load(open(file, 'r')))
+    except IOError as e:
+        print("Database unable to read '" + username + "'.")
+    finally:
+        return database
 
 
 def find_user(username):
@@ -21,7 +46,19 @@ def auto_backup():
     """
     from time import sleep
     from datetime import datetime
-    backup_interval = 10
+    backup_interval = 2
+    # Make sure the backup directory and the db directory exist
+    if 'backup' not in os.listdir(os.getcwd()):
+        try:
+            os.mkdir(os.getcwd() + '/backup')
+        except OSError:
+            print("Backup directory creation failed")
+    if 'db' not in os.listdir(os.getcwd()):
+        try:
+            os.mkdir(os.getcwd() + '/db')
+        except OSError:
+            print("Backup directory creation failed")
+
     while True:
         if datetime.utcnow().minute % backup_interval == 0:
             backup_libraries()
@@ -39,57 +76,14 @@ def backup_libraries():
         except OSError:
             print("Backup directory creation failed")
 
-    # For Every File in the directory ending with json or db
-    for file in os.listdir("."):
-        if file.endswith(".json") or file.endswith(".db"):
+    # For Every File in the database directory ending with json
+    for file in os.listdir("db"):
+        if file.endswith(".json"):
             print("Backing up:", file)
             # Dump the file in the backup folder as a json file
-            output = safe_db_load(file)
-            safe_db_dump(output, os.path.join('backup', file))
-
-
-def add_to_library(lib_item, user):
-    """ add_to_library()
-    Adds an Item to a users database
-    :param lib_item: dict_item: {Key, Value} dict item pair
-    :param user : str: A string of the username
-    :return True: Successfully added
-            False: Otherwise
-    """
-    exists = False
-    for file in os.listdir("."):
-        if file.endswith(".json") and file[:-5] == user:
-            # Get the file information
-            stuff = safe_db_load(file)
-            if stuff is None:
-                # Nothing loaded
-                break
-            stuff.update(lib_item)
-            safe_db_dump(stuff, file)
-            exists = True
-    return exists
-
-
-def remove_from_library(lib_key, user):
-    """ remove_from_library
-    Removes an item from a user's database
-    :param lib_key: dict_key: A dictionary key to be removed
-    :param user: str: The username of the owner of the database
-    :return True: Successfully removed
-            False: Otherwise
-    """
-    for file in os.listdir("."):
-        if file.endswith(".json") and user == file[:-5]:
-            # print(file)
-            stuff = safe_db_load(file)
-            if lib_key in list(stuff.keys()):
-                stuff.pop(lib_key)
-                # print(stuff)
-                safe_db_dump(stuff, file)
-                return True
-            else:
-                print("Key not found")
-                return False
+            class_output = retrieve_user(file)
+            if class_output is not None:
+                class_output.to_backup()
 
 
 def add_user(name, private_key, public_key):
@@ -107,25 +101,33 @@ def add_user(name, private_key, public_key):
         print("Send error to the user")
         return False
     else:
-        # Create Empty Database
-        safe_db_dump({}, name + '.json')
+        # Create and store Empty User Item
+        user = User(name)
+        user.to_file()
         # Save the Private and Public Key under the Key Library
         user_keys = json.load(open('keys.db', 'r'))
-        user_keys[name] = {"private": private_key, "public": public_key}
+        user_keys[name] = {
+            "private": hashlib.md5(private_key.encode()).hexdigest(),
+            "public": hashlib.md5(public_key.encode()).hexdigest()
+        }
         json.dump(user_keys, open('keys.db', 'w'), indent=2)
         return True
 
 
 def delete_user(name):
     """ delete_user()
-    deletes a user to the Database
+    deletes a user from the Database
     name: str: Username to be removed
     Returns:
             True: Adds a user to the database
             False: Otherwise
     """
-    if os.path.exists(name + ".json"):
-        os.remove(name + ".json")
+    # Check if the file exists
+    if os.path.exists(os.path.join('db', name + ".json")):
+        # Try and remove
+        os.remove(os.path.join('db', name + ".json"))
+
+        # Remove from the Key DB
         user_keys = json.load(open('keys.db', 'r'))
         user_keys.pop(name)
         json.dump(user_keys, open('keys.db', 'w'), indent=2)

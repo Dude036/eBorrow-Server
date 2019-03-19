@@ -2,9 +2,6 @@
 Error Handler
 '''
 
-from multiprocessing import Queue
-error_buffer = Queue()
-
 ERROR_CODES = {
     1: 'Invalid Packet Format',
     2: 'Invalid/Unrecognized Packet ID',
@@ -24,30 +21,18 @@ ERROR_CODES = {
     16: 'Username already exists',
     17: 'Username not found',
     18: 'Unterminated Transmission Buffer Received',
+    19: 'Invalid JSON',
     99: 'Unknown Error Occurred. Unable to resolve error'
 }
 
 
-def error_handler():
-    global error_buffer
+def error_handler(error_buffer, transmit_buffer):
+    # global error_buffer
     while True:
         code, addr = error_buffer.get()
         print("Starting Error Notification")
-        if isinstance(code, str):
-            if code not in list(ERROR_CODES.values()):
-                print("Error string Not found")
-                continue
-            else:
-                for key, value in ERROR_CODES.items():
-                    if value == code:
-                        code = key
-                        break
-        elif isinstance(code, int):
-            if code not in list(ERROR_CODES.keys()):
-                print("Error Code Not found")
-                continue
-        else:
-            print("Error Code or string not valid format")
+        if code not in list(ERROR_CODES.keys()):
+            print("Error Code Not found")
             continue
 
         # Valid Key, set to the Key reference

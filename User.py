@@ -1,29 +1,5 @@
 import simplejson as json
-from database import find_user
 import os
-
-
-def retrieve_user(username):
-    """
-    A function to return a database from a username
-    :param username: a string of a username to retrieve
-    :return: If user exists in the database:
-                A user object
-             Else:
-                None
-    """
-    database = None
-    try:
-        if find_user(username):
-            database = json.load(
-                open(os.path.join('db', username + '.json'), 'r'))
-    except IOError as e:
-        print("Database unable to read '" + username + "'.")
-    finally:
-        if database is None:
-            return None
-        else:
-            return User(username, json_data=database)
 
 
 class User(object):
@@ -47,6 +23,12 @@ class User(object):
             self.Exchange = exchange
         else:
             self.__read(json_data)
+        if self.Inventory is None:
+            self.Inventory = {}
+        if self.Messages is None:
+            self.Messages = []
+        if self.Exchange is None:
+            self.Exchange = []
 
     def __read(self, json_data):
         """
@@ -75,7 +57,13 @@ class User(object):
         """
         Sends the database to a file
         """
-        json.dump(self.serialize(), open(self.Username + '.json', 'w'))
+        json.dump(self.serialize(), open(os.path.join('db', self.Username + '.json'), 'w'))
+
+    def to_backup(self):
+        """
+        Sends the database to a file
+        """
+        json.dump(self.serialize(), open(os.path.join('backup', self.Username + '.json'), 'w'), indent=2)
 
     def add_to_inventory(self, lib_item):
         """ add_to_library()
@@ -83,7 +71,7 @@ class User(object):
         :param lib_item: dictionary item {Key, Value} to add to the inventory
         """
         for key, value in lib_item.items():
-            self.Inventory.update(key=value)
+            self.Inventory.update({key: value})
 
     def remove_from_inventory(self, lib_key):
         """
@@ -102,8 +90,8 @@ class User(object):
 
 
 if __name__ == '__main__':
-    person_a = User('person_a', inventory={
-                    'key1': 1}, messages=['test'], exchange={})
+    person_a = User('person_a', inventory={'key1': 1}, messages=['test'], exchange={})
     print(person_a.serialize())
     person_b = User('person_b', json_data=person_a.serialize())
     print(person_b.serialize())
+    person_a.to_file()

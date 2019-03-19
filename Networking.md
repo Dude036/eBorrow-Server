@@ -23,31 +23,31 @@ These are interpreted commands that edits the database in some manner or form. T
 		Header:
 			@username:0
 		Packet:
-			{"Private": Private_key, "Public":Public_key}
+			{"private": Private_key, "public":Public_key}
 
 * Delete Existing User
 
 		Header:
 			@username:1
 		Packet:
-			{"Delete": 1, "Public":Public_key, "Private":Private_key}
+			{"Delete": 1, "public":Public_key, "private":Private_key}
 
 * Remove an item from the database
 
 		Header:
 			@username:2
 		Packet:
-			{"Key":SHA_256 Hash of item, "Private":Private_key}
+			{"Key":SHA_256 Hash of item, "private":Private_key}
 
 * Add an item to database
 	
 		Header:
 			@username:3
 		Packet:
-			{"SHA_256 Hash of item":{json data}, "Private":Private_key}
+			{"SHA_256 Hash of item":{json data}, "private":Private_key}
 
 
-**NOTE**: This can be used to retrieve many items from the database, simply add more key, value pairs to the json object. There need only be one "Private" key.
+**NOTE**: This can be used to retrieve many items from the database, simply add more key, value pairs to the json object. There need only be one "private" key.
 
 
 * Send All Data
@@ -55,14 +55,14 @@ These are interpreted commands that edits the database in some manner or form. T
 		Header:
 			@username:4
 		Packet:
-			{"Public":Public_key}
+			{"public":Public_key}
 
 * Send Specific Data
 
 		Header:
 			@username:5
 		Packet:
-			{"SHA_256 Hash of item": 1, "Public":Public_key}
+			{"SHA_256 Hash of item": 1, "public":Public_key}
 
 * Item Current Ownership Update
 
@@ -72,8 +72,8 @@ These are interpreted commands that edits the database in some manner or form. T
             {
                 "SHA_256 Hash of item": 1, 
                 "New Owner": "friend_username",
-                "Public": "Friends_Public_key",
-                "Private": "Username_Private_key",
+                "public": "Friends_Public_key",
+                "private": "Username_Private_key",
                 "Schedule": {
                     "In": [Day, Month, Year],
                     "Out": [Day, Month, Year],
@@ -115,7 +115,7 @@ These commands are only read by the server, and are stored in a buffer. Whenever
 * Add Friend
 
         Header:
-            @username:102
+            @your_username:102
         Packet:
             {
                 "Target": "friends_username"
@@ -136,7 +136,7 @@ These are commands that are sent, per request from a user, to the connected IP a
 
 **NOTE**: These commands will send a multiple of objects, if requested.
 
-* Send Item:		
+* Send Item(s):		
 
 		Header:
 			@username:200
@@ -144,7 +144,7 @@ These are commands that are sent, per request from a user, to the connected IP a
 			{"SHA_256 Hash of item":{json data}, "SHA_256 Hash of item":{json data}, ... }
 
 
-* Send Messages:
+* Send Message(s):
 
 		Header:
 			@username:201
@@ -152,7 +152,7 @@ These are commands that are sent, per request from a user, to the connected IP a
 			["Message", "Message", ... ]
 
 
-* Send Exchanges:		
+* Send Exchange(s):		
 
 		Header:
 			@username:202

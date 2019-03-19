@@ -1,11 +1,14 @@
 #!/usr/bin/python3
 
-import simplejson as json
-from multiprocessing import Process
+from multiprocessing import Process, SimpleQueue
 from database import auto_backup
 from errors import error_handler
 from networking import network_main
 from decoder import decoding
+
+decode_buffer = SimpleQueue()
+transmit_buffer = SimpleQueue()
+error_buffer = SimpleQueue()
 
 
 if __name__ == '__main__':
@@ -14,9 +17,11 @@ if __name__ == '__main__':
     # 2) Listen on the Decoding Queue to interpret data
     # 3) Listen on the Error Queue to send return messages
     # 4) Scheduled backups
-    runnables = [Process(target=network_main), Process(target=decoding), Process(
-        target=error_handler), Process(target=auto_backup)]
-
+    runnables = [
+        Process(target=network_main, args=tuple((decode_buffer, error_buffer))),
+        Process(target=decoding, args=tuple((decode_buffer, error_buffer, transmit_buffer))),
+        Process(target=error_handler, args=iter((error_buffer, transmit_buffer))),
+        Process(target=auto_backup)]
     # Run the tasks
     for r in runnables:
         print("Beginning:", str(r))
