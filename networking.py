@@ -15,7 +15,7 @@ def recv_until(sock):
     total_data = []
     # data = b''
     start = time.time()
-    timeout = 5
+    timeout = 20
     while True:
         data = sock.recv(BUFF_SIZE)
         if END_BYTE in data:
@@ -29,7 +29,7 @@ def recv_until(sock):
                 total_data[-2] = last_pair[:last_pair.find(END_BYTE)]
                 total_data.pop()
                 break
-        if time.time() > timeout:
+        if time.time() - start > timeout:
             return ''
     return ''.join([thing.decode() for thing in total_data])
 

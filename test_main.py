@@ -124,7 +124,7 @@ if __name__ == '__main__':
     input(format("Press Enter to Continue", '^100s'))
 
     # Add all items to user 1
-    test_add_db_item(test_username_1, private_key_1)
+    test_add_many_db_item(test_username_1, private_key_1)
     input(format("Press Enter to Continue", '^100s'))
 
     # Remove Items
