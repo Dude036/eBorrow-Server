@@ -88,6 +88,44 @@ class User(object):
         finally:
             return result
 
+    def send_items(self, hash_list):
+        """
+        Creating a Packet to send information
+        :param hash_list: A list of hashes that the user wants
+        :return: A string ready to be sent back to the user
+        """
+        header = '@' + self.Username + ':200'
+        packet = '{'
+        for item in hash_list:
+            try:
+                packet += '"' + item + '": ' + json.dumps(self.Inventory[item]) + ','
+            except KeyError as e:
+                print("Item not in the database.")
+                print(e)
+        packet = packet[:-1]
+        packet += '}'
+
+        return header + ' ' + packet
+
+    def send_messages(self):
+        """
+        Creating a packet to send User messages back
+        :return: A string ready to be sent back to the user
+        """
+        header = '@' + self.Username + ':201'
+        packet = str(self.Messages)
+        return header + ' ' + packet
+
+    def send_exchanges(self):
+        """
+        Creating a packet to send User Exchanges back
+        :return: A string ready to be sent back to the user
+        """
+        header = '@' + self.Username + ':201'
+        # TODO: Build an Exchange translator
+        packet = str(self.Exchange)
+        return header + ' ' + packet
+
 
 if __name__ == '__main__':
     person_a = User('person_a', inventory={'key1': 1}, messages=['test'], exchange={})
