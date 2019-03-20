@@ -183,14 +183,12 @@ def interpretted(username, packet_id, packet, addr, error_buffer, transmit_buffe
 
         if verify_key(username, packet['public'], public=True):
             if packet['Library'] == 1:
-                new_header = '@' + username + ':200'
                 user = retrieve_user(username)
                 if user is None:
                     print("User not found in the database")
                     error_buffer.put([17, addr])
                     return
-                new_packet = user.Inventory
-                transmit_buffer.put([new_header + ' ' + json.dumps(new_packet), addr])
+                transmit_buffer.put([user.send_items(list(user.Inventory.keys())), addr])
             else:
                 print("Invalid Packet Format")
                 error_buffer.put([1, addr])
