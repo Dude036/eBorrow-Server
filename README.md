@@ -47,9 +47,9 @@ We use GitHub's versioning system. The *master* branch is to remain untouched un
 ## Authors (sorted alphabetically)
 
 * **Joshua Higham** - Backend/Networking/Security/Database
-* **Caleb Lundquist** - Frontend/Networking
+* **Caleb Lundquist** - Frontend/User Interface
 * **Tim Weber** - Backend/Networking/Security
-* **Jordan Yates** - Frontend/GUI/Security
+* **Jordan Yates** - Frontend/Networking/Security
 
 ## License
 
