@@ -84,6 +84,19 @@ These are interpreted commands that edits the database in some manner or form. T
 
 **NOTE**: This is the creation of an exchange item. This will be modified at runtime according to their owners databases. I.e. the Current Owner of the item will be separate from the Permanent owner until the specified out schedule in the Permanent owner's database. 
 
+* Send Messages
+
+		Header:
+			@your_username:7
+		Packet:
+			{"Messages": 1, "private":Private_key}
+
+* Send Exchanges
+
+		Header:
+			@your_username:8
+		Packet:
+			{"Exchanges": 1, "private":Private_key}
 
 #### Piped Commands
 
@@ -138,7 +151,7 @@ These are commands that are sent, per request from a user, to the connected IP a
 
 **NOTE**: These commands will send a multiple of objects, if requested.
 
-* Send Item(s):		
+* Return Item(s):		
 
 		Header:
 			@username:200
@@ -146,7 +159,7 @@ These are commands that are sent, per request from a user, to the connected IP a
 			{"SHA_256 Hash of item":{json data}, "SHA_256 Hash of item":{json data}, ... }
 
 
-* Send Message(s):
+* Return Message(s):
 
 		Header:
 			@username:201
@@ -154,7 +167,7 @@ These are commands that are sent, per request from a user, to the connected IP a
 			["Message", "Message", ... ]
 
 
-* Send Exchange(s):		
+* Return Exchange(s):		
 
 		Header:
 			@username:202
