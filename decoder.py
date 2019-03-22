@@ -2,6 +2,7 @@ import re
 from database import add_user, delete_user, ownership_change, retrieve_user
 import simplejson as json
 import hashlib
+import logging
 
 
 def verify_key(username, key, public=True):
@@ -27,8 +28,8 @@ def decoding(decode_buffer, error_buffer, transmit_buffer):
     while True:
         # Wait for the Queue to be filled. Recieves the Item and the Address
         item, addr = decode_buffer.get()
-        print("Starting Decoding process.")
-        print("Extracting User Information")
+        logging.info("Starting Decoding process.")
+        logging.info("Extracting User Information")
 
         # Split the item into Header and Packet
         header = None
@@ -39,8 +40,8 @@ def decoding(decode_buffer, error_buffer, transmit_buffer):
             packet = match.group(2)
         else:
             # Send Data to addr about the error
-            print("Dismissing: Invalid header format")
-            print("Sending Error to:", addr)
+            logging.error("Dismissing: Invalid header format")
+            logging.info("Sending Error to: %s" % addr)
             error_buffer.put([1, addr])
             continue
 
@@ -56,14 +57,14 @@ def decoding(decode_buffer, error_buffer, transmit_buffer):
         # No Delimiter = Error in the Header
         if delimit_pos == 0:
             # Send Data to addr about the error
-            print("Dismissing: Invalid header format")
-            print("Sending Error to:", addr)
+            logging.error("Dismissing: Invalid header format")
+            logging.info("Sending Error to: %s" % addr)
             error_buffer.put([5, addr])
             continue
 
         # Set Username
         username = header[:delimit_pos]
-        print("Username:", username)
+        logging.debug("Username: %s : Connected" % username)
         # Remove the '@' and remove username from the header
         username = username[1:]
         header = header[delimit_pos:]
@@ -74,16 +75,16 @@ def decoding(decode_buffer, error_buffer, transmit_buffer):
             packet_id = int(match.group(1))
         else:
             # Send Data to addr about the error
-            print("Dismissing: No packet ID")
-            print("Sending Error to:", addr)
+            logging.error("Dismissing: No packet ID")
+            logging.info("Sending Error to: %s" % addr)
             error_buffer.put([2, addr])
             continue
-        print('Processing Packet ID:', packet_id)
+        logging.debug('Processing Packet ID: %s' % packet_id)
 
         try:
             packet = json.loads(packet)
         except Exception:
-            print("unable to decode JSON")
+            logging.error("unable to decode JSON")
             error_buffer.put([19, addr])
             continue
 
@@ -92,7 +93,7 @@ def decoding(decode_buffer, error_buffer, transmit_buffer):
         elif 100 <= packet_id <= 199:
             piped(username, packet_id, packet, addr, error_buffer, transmit_buffer)
         else:
-            print("Unrecognized Packet ID")
+            logging.error("Unrecognized Packet ID")
             error_buffer.put([2, addr])
             continue
 
@@ -121,18 +122,18 @@ def interpretted(username, packet_id, packet, addr, error_buffer, transmit_buffe
             if verify_key(username, secret_key, public=False):
                 if verify_key(username, public_key, public=True):
                     if delete_user(username):
-                        print("User Deleted")
+                        logging.debug("%s Deleted" % username)
                     else:
-                        print("User not found in database")
+                        logging.error("User not found in database")
                         error_buffer.put([17, addr])
                 else:
-                    print("Incorrect public Key")
+                    logging.error("Incorrect public Key")
                     error_buffer.put([4, addr])
             else:
-                print("Incorrect private Key")
+                logging.error("Incorrect private Key")
                 error_buffer.put([3, addr])
         else:
-            print("Unspecified Deletion command")
+            logging.error("Unspecified Deletion command")
             error_buffer.put([7, addr])
 
     elif packet_id == 2:
@@ -140,26 +141,26 @@ def interpretted(username, packet_id, packet, addr, error_buffer, transmit_buffe
         if verify_key(username, packet['private'], public=False):
             user = retrieve_user(username)
             if user is None:
-                print("User not found in the database")
+                logging.error("User not found in the database")
                 error_buffer.put([17, addr])
                 return
             if isinstance(packet['Key'], str):
                 if not user.remove_from_inventory(packet['Key']):
-                    print("Key not found in Library")
-                    print("Sending Error to:", addr)
+                    logging.error("Key not found in Library")
+                    logging.error("Sending Error to:", addr)
                     error_buffer.put([8, addr])
             elif isinstance(packet['Key'], list):
                 for item in packet['Key']:
                     if not user.remove_from_inventory(item):
-                        print("Key not found in Library")
-                        print("Sending Error to:", addr)
+                        logging.error("Key not found in Library")
+                        logging.error("Sending Error to:", addr)
                         error_buffer.put([8, addr])
             else:
-                print("Value not acceptable data type")
+                logging.error("Value not acceptable data type")
                 error_buffer.put([20, addr])
             user.to_file()
         else:
-            print("Incorrect private Key")
+            logging.error("Incorrect private Key")
             error_buffer.put([3, addr])
 
     elif packet_id == 3:
@@ -168,14 +169,14 @@ def interpretted(username, packet_id, packet, addr, error_buffer, transmit_buffe
             packet.pop("private")
             user = retrieve_user(username)
             if user is None:
-                print("User not found in the database")
+                logging.error("User not found in the database")
                 error_buffer.put([17, addr])
                 return
             for key, value in packet.items():
                 user.add_to_inventory({key: value})
             user.to_file()
         else:
-            print("Incorrect private Key")
+            logging.error("Incorrect private Key")
             error_buffer.put([3, addr])
 
     elif packet_id == 4:
@@ -185,15 +186,15 @@ def interpretted(username, packet_id, packet, addr, error_buffer, transmit_buffe
             if packet['Library'] == 1:
                 user = retrieve_user(username)
                 if user is None:
-                    print("User not found in the database")
+                    logging.error("User not found in the database")
                     error_buffer.put([17, addr])
                     return
                 transmit_buffer.put([user.send_items(list(user.Inventory.keys())), addr])
             else:
-                print("Invalid Packet Format")
+                logging.error("Invalid Packet Format")
                 error_buffer.put([1, addr])
         else:
-            print("Incorrect private Key")
+            prilogging.errornt("Incorrect private Key")
             error_buffer.put([3, addr])
 
     elif packet_id == 5:
@@ -203,7 +204,7 @@ def interpretted(username, packet_id, packet, addr, error_buffer, transmit_buffe
             new_header = '@' + username + ':200'
             user = retrieve_user(username)
             if user is None:
-                print("User not found in the database")
+                logging.error("User not found in the database")
                 error_buffer.put([17, addr])
                 return
             new_packet = {}
@@ -211,12 +212,12 @@ def interpretted(username, packet_id, packet, addr, error_buffer, transmit_buffe
                 try:
                     new_packet[key] = user.Inventory[key]
                 except KeyError:
-                    print("Unable to find specific Key")
+                    logging.error("Unable to find specific Key")
                     error_buffer.put([8, addr])
 
             transmit_buffer.put([new_header + ' ' + json.dumps(new_packet), addr])
         else:
-            print("Incorrect private Key")
+            logging.error("Incorrect private Key")
             error_buffer.put([3, addr])
     elif packet_id == 6:
         # Update Item Ownership
