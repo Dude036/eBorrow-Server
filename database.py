@@ -4,6 +4,7 @@ import os
 import simplejson as json
 from User import User
 import hashlib
+import logging
 
 
 def retrieve_user(username):
@@ -24,7 +25,7 @@ def retrieve_user(username):
             file = os.path.join('db', username + '.json')
             database = User(username, json_data=json.load(open(file, 'r')))
     except IOError as e:
-        print("Database unable to read '" + username + "'.")
+        logging.ERROR("Database unable to read '" + username + "'.")
     finally:
         return database
 
@@ -52,12 +53,12 @@ def auto_backup():
         try:
             os.mkdir(os.getcwd() + '/backup')
         except OSError:
-            print("Backup directory creation failed")
+            logging.ERROR("Backup directory creation failed")
     if 'db' not in os.listdir(os.getcwd()):
         try:
             os.mkdir(os.getcwd() + '/db')
         except OSError:
-            print("Backup directory creation failed")
+            logging.ERROR("Backup directory creation failed")
 
     while True:
         if datetime.utcnow().minute % backup_interval == 0:
@@ -74,12 +75,12 @@ def backup_libraries():
         try:
             os.mkdir(os.getcwd() + '/backup')
         except OSError:
-            print("Backup directory creation failed")
+            logging.ERROR("Backup directory creation failed")
 
     # For Every File in the database directory ending with json
     for file in os.listdir("db"):
         if file.endswith(".json"):
-            print("Backing up:", file)
+            logging.INFO("Backing up:", file)
             # Dump the file in the backup folder as a json file
             class_output = retrieve_user(file)
             if class_output is not None:
@@ -97,8 +98,8 @@ def add_user(name, private_key, public_key):
     """
     # Validate if the Username Exists
     if find_user(name):
-        print("User already in database")
-        print("Send error to the user")
+        logging.ERROR("User already in database")
+        logging.INFO("Send error to the user")
         return False
     else:
         # Create and store Empty User Item
@@ -133,7 +134,7 @@ def delete_user(name):
         json.dump(user_keys, open('keys.db', 'w'), indent=2)
         return True
     else:
-        print("The file does not exist")
+        logging.INFO("The file does not exist")
         return False
 
 
@@ -144,26 +145,7 @@ def ownership_change(item_key, former_owner, future_owner):
     former_owner: str: username of the former owner of the item
     future_owner: str: username of the new item recipient 
     """
-    if not find_user(former_owner):
-        print("User not in database")
-        print("Send error to the user")
-        return False
-    elif not find_user(future_owner):
-        print("User not in database")
-        print("Send error to the user")
-        return False
-    else:
-        # Get the two databses
-        former_owner_db = safe_db_load(former_owner + '.json')
-        future_owner_db = safe_db_load(future_owner + '.json')
-        # Get the item and change the current owner
-        ret_val = former_owner_db.pop(item_key)
-        ret_val.update({'Current Owner': future_owner})
-        future_owner_db.update({item_key: ret_val})
-        # Save the databses
-        safe_db_dump(former_owner_db, former_owner + '.json')
-        safe_db_dump(future_owner_db, future_owner + '.json')
-        return True
+    pass
 
 
 if __name__ == '__main__':
