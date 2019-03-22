@@ -1,5 +1,6 @@
 import simplejson as json
 import os
+import logging
 
 
 class User(object):
@@ -36,11 +37,11 @@ class User(object):
         :param json_data: json object to attribute back into a class object
         """
         if "Inventory" not in list(json_data.keys()):
-            print("Missing 'Inventory' key")
+            logging.INFO("Missing 'Inventory' key")
         elif "Messages" not in list(json_data.keys()):
-            print("Missing 'Messages' key")
+            logging.INFO("Missing 'Messages' key")
         elif "Exchange" not in list(json_data.keys()):
-            print("Missing 'Exchange' key")
+            logging.INFO("Missing 'Exchange' key")
         else:
             self.Inventory = json_data['Inventory']
             self.Messages = json_data['Messages']
@@ -82,8 +83,8 @@ class User(object):
         try:
             self.Inventory.pop(lib_key)
         except KeyError as e:
-            print("Item not in the database.")
-            print(e)
+            logging.ERROR("Item not in the database.")
+            logging.ERROR(e)
             result = False
         finally:
             return result
@@ -100,8 +101,8 @@ class User(object):
             try:
                 packet += '"' + item + '": ' + json.dumps(self.Inventory[item]) + ','
             except KeyError as e:
-                print("Item not in the database.")
-                print(e)
+                logging.ERROR("Item not in the database.")
+                logging.ERROR(e)
         packet = packet[:-1]
         packet += '}'
 
