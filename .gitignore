@@ -1,6 +1,7 @@
 build/
 dist/
 __pycache__/
+config.json
 *.log
 *.spec
 *.db
