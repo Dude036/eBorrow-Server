@@ -37,11 +37,11 @@ class User(object):
         :param json_data: json object to attribute back into a class object
         """
         if "Inventory" not in list(json_data.keys()):
-            logging.INFO("Missing 'Inventory' key")
+            logging.info("Missing 'Inventory' key")
         elif "Messages" not in list(json_data.keys()):
-            logging.INFO("Missing 'Messages' key")
+            logging.info("Missing 'Messages' key")
         elif "Exchange" not in list(json_data.keys()):
-            logging.INFO("Missing 'Exchange' key")
+            logging.info("Missing 'Exchange' key")
         else:
             self.Inventory = json_data['Inventory']
             self.Messages = json_data['Messages']
@@ -83,8 +83,8 @@ class User(object):
         try:
             self.Inventory.pop(lib_key)
         except KeyError as e:
-            logging.ERROR("Item not in the database.")
-            logging.ERROR(e)
+            logging.error("Item not in the database.")
+            logging.error(e)
             result = False
         finally:
             return result
@@ -101,8 +101,8 @@ class User(object):
             try:
                 packet += '"' + item + '": ' + json.dumps(self.Inventory[item]) + ','
             except KeyError as e:
-                logging.ERROR("Item not in the database.")
-                logging.ERROR(e)
+                logging.error("Item not in the database.")
+                logging.error(e)
         packet = packet[:-1]
         packet += '}'
 
