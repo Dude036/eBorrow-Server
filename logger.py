@@ -1,6 +1,7 @@
 import logging
 import simplejson as json
 
+open('out.log', 'w')
 logging.basicConfig(format='%(asctime)s :: %(levelname)8s :: %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p', filename='out.log', level=logging.DEBUG)
 
 

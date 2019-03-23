@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 import socket
 import time
+import logging
 
 END_BYTE = b'\x7F\xFF\x7F\xFF'
 BUFF_SIZE = 8192
@@ -49,20 +50,20 @@ def network_main(decode_buffer, error_buffer):
             conn, addr = s.accept()
             # Got a connection.
             with conn:
-                print('Connected by', addr)
+                logging.debug('Connected by %s' % str(addr))
                 try:
                     data = recv_until(conn)
                     if data == '':
-                        print("Unterminated string received")
+                        logging.error("Unterminated string received")
                         error_buffer.put([18, addr])
                     else:
                         # Send off to Decode
-                        print("Recieved:", "Length:", len(data))
+                        logging.info("Received Length: %s" % len(data))
                         decode_buffer.put([data, addr])
                 except Exception as e:
-                    print(type(e))
-                    print(e.args)
-                    print(e)
+                    logging.debug(type(e))
+                    logging.debug(e.args)
+                    logging.debug(e)
 
 
 def network_transmit(transmit_buffer):
