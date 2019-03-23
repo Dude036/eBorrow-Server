@@ -32,7 +32,7 @@ def error_handler(error_buffer, transmit_buffer):
     # global error_buffer
     while True:
         code, addr = error_buffer.get()
-        print("Starting Error Notification")
+        logging.info("Starting Error Notification")
         if code not in list(ERROR_CODES.keys()):
             logging.warning("Error Code Not found")
             code = 99
