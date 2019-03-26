@@ -1,3 +1,4 @@
+import logging
 '''
 Error Handler
 '''
@@ -31,11 +32,12 @@ def error_handler(error_buffer, transmit_buffer):
     # global error_buffer
     while True:
         code, addr = error_buffer.get()
-        print("Starting Error Notification")
+        logging.info("Starting Error Notification")
         if code not in list(ERROR_CODES.keys()):
-            print("Error Code Not found")
-            continue
+            logging.warning("Error Code Not found")
+            code = 99
 
         # Valid Key, set to the Key reference
         print("Code:", code)
         print("Message:", ERROR_CODES[code])
+

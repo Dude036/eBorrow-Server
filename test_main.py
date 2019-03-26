@@ -10,6 +10,17 @@ from time import sleep
 import os
 
 
+def generate_private_public_keypair():
+    k = crypto.PKey()
+    k.generate_key(crypto.TYPE_RSA, 4096)
+    private_key = ''.join(crypto.dump_privatekey(
+        crypto.FILETYPE_PEM, k).decode().split('\n')[1:-2]).encode()
+    public_key = ''.join(crypto.dump_publickey(
+        crypto.FILETYPE_PEM, k).decode().split('\n')[1:-2]).encode()
+
+    return private_key, public_key
+
+
 class NetworkingTest(unittest.TestCase):
     """docstring for NetworkingTest"""
     def __init__(self):
@@ -21,8 +32,8 @@ class NetworkingTest(unittest.TestCase):
         self.Items = json.load(open("db.json", 'r'))
         print("Generating Key Pairs")
 
-        self.private_key_1, self.public_key_1 = self.generate_private_public_keypair()
-        self.private_key_2, self.public_key_2 = self.generate_private_public_keypair()
+        self.private_key_1, self.public_key_1 = generate_private_public_keypair()
+        self.private_key_2, self.public_key_2 = generate_private_public_keypair()
 
         self.test_username_1 = 'username_1'
         self.test_username_2 = 'username_2'
@@ -126,16 +137,6 @@ class NetworkingTest(unittest.TestCase):
     def test_ownership_change(self):
         # TODO: Impliment Test Here
         pass
-
-    def generate_private_public_keypair(self):
-        k = crypto.PKey()
-        k.generate_key(crypto.TYPE_RSA, 4096)
-        self.private_key_1 = ''.join(crypto.dump_privatekey(
-            crypto.FILETYPE_PEM, k).decode().split('\n')[1:-2]).encode()
-        public_key = ''.join(crypto.dump_publickey(
-            crypto.FILETYPE_PEM, k).decode().split('\n')[1:-2]).encode()
-
-        return self.private_key_1, public_key
 
     def main(self):
         # Make Both Users
