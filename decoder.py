@@ -1,6 +1,7 @@
 import re
 from database import add_user, delete_user, ownership_change, retrieve_user
 import simplejson as json
+from errors import error_handler
 import hashlib
 import logging
 
@@ -24,12 +25,12 @@ def verify_key(username, key, public=True):
         return all_keys[username]['private'] == hashlib.md5(key.encode()).hexdigest()
 
 
-def decoding(decode_buffer, error_buffer, transmit_buffer):
+def decoding(decode_buffer, transmit_buffer):
     while True:
         # Wait for the Queue to be filled. Recieves the Item and the Address
         item, addr = decode_buffer.get()
-        logging.info("Starting Decoding process.")
-        logging.info("Extracting User Information")
+        logging.info("DECODER :: Starting Decoding process.")
+        logging.info("DECODER :: Extracting User Information")
 
         # Split the item into Header and Packet
         header = None
@@ -40,9 +41,9 @@ def decoding(decode_buffer, error_buffer, transmit_buffer):
             packet = match.group(2)
         else:
             # Send Data to addr about the error
-            logging.error("Dismissing: Invalid header format")
-            logging.info("Sending Error to: %s" % addr)
-            error_buffer.put([1, addr])
+            logging.error("DECODER :: Dismissing: Invalid header format")
+            logging.info("DECODER :: Sending Error to: %s" % addr)
+            transmit_buffer.put([error_handler(1), addr])
             continue
 
         # Every command starts with the Username, It's easy to get that out of the way
@@ -57,14 +58,14 @@ def decoding(decode_buffer, error_buffer, transmit_buffer):
         # No Delimiter = Error in the Header
         if delimit_pos == 0:
             # Send Data to addr about the error
-            logging.error("Dismissing: Invalid header format")
-            logging.info("Sending Error to: %s" % addr)
-            error_buffer.put([5, addr])
+            logging.error("DECODER :: Dismissing: Invalid header format")
+            logging.info("DECODER :: Sending Error to: %s" % addr)
+            transmit_buffer.put([error_handler(5), addr])
             continue
 
         # Set Username
         username = header[:delimit_pos]
-        logging.debug("Username: %s : Connected" % username)
+        logging.debug("DECODER :: Username: %s : Connected" % username)
         # Remove the '@' and remove username from the header
         username = username[1:]
         header = header[delimit_pos:]
@@ -75,164 +76,186 @@ def decoding(decode_buffer, error_buffer, transmit_buffer):
             packet_id = int(match.group(1))
         else:
             # Send Data to addr about the error
-            logging.error("Dismissing: No packet ID")
-            logging.info("Sending Error to: %s" % addr)
-            error_buffer.put([2, addr])
+            logging.error("DECODER :: Dismissing: No packet ID")
+            logging.info("DECODER :: Sending Error to: %s" % addr)
+            transmit_buffer.put([error_handler(2), addr])
             continue
-        logging.debug('Processing Packet ID: %s' % packet_id)
+        logging.debug('DECODER :: Processing Packet ID: %s' % packet_id)
 
         try:
             packet = json.loads(packet)
-        except Exception:
-            logging.error("unable to decode JSON")
-            error_buffer.put([19, addr])
+        except Exception as e:
+            logging.error("DECODER :: Unable to decode JSON")
+            transmit_buffer.put([error_handler(19), addr])
             continue
 
         if 0 <= packet_id < 100:
-            interpretted(username, packet_id, packet, addr, error_buffer, transmit_buffer)
+            interpretted(username, packet_id, packet, addr, transmit_buffer)
         elif 100 <= packet_id <= 199:
-            piped(username, packet_id, packet, addr, error_buffer, transmit_buffer)
+            piped(username, packet_id, packet, addr, transmit_buffer)
         else:
-            logging.error("Unrecognized Packet ID")
-            error_buffer.put([2, addr])
+            logging.error("DECODER :: Unrecognized Packet ID")
+            transmit_buffer.put([error_handler(2), addr])
             continue
 
 
-def interpretted(username, packet_id, packet, addr, error_buffer, transmit_buffer):
+def interpretted(username, packet_id, packet, addr, transmit_buffer):
     """
     Interpretted commands for the server. These range from the values 0 <= packey_id <= 99 in Networking.md
     :param username: Username of the subject
     :param packet_id: Packet identifier. Determines how the packet is handled
     :param packet: The actual packet dictionary
     :param addr: the IP address to return to
-    :param error_buffer:
     :param transmit_buffer:
     """
     if packet_id == 0:
         # New User Application
+        # Not necessary to return anything for this function
         secret_key = packet['private']
         public_key = packet['public']
         add_user(username, secret_key, public_key)
+        transmit_buffer.put([error_handler(0), addr])
 
     elif packet_id == 1:
         # Delete User from Database
+        # Not necessary to return anything for this function
         secret_key = packet['private']
         public_key = packet["public"]
         if packet["Delete"] == 1:
             if verify_key(username, secret_key, public=False):
                 if verify_key(username, public_key, public=True):
                     if delete_user(username):
-                        logging.debug("%s Deleted" % username)
+                        logging.debug("DECODER :: %s Deleted" % username)
+                        transmit_buffer.put([error_handler(0), addr])
                     else:
-                        logging.error("User not found in database")
-                        error_buffer.put([17, addr])
+                        logging.error("DECODER :: User not found in database")
+                        transmit_buffer.put([error_handler(17), addr])
                 else:
-                    logging.error("Incorrect public Key")
-                    error_buffer.put([4, addr])
+                    logging.error("DECODER :: Incorrect public Key")
+                    transmit_buffer.put([error_handler(4), addr])
             else:
-                logging.error("Incorrect private Key")
-                error_buffer.put([3, addr])
+                logging.error("DECODER :: Incorrect private Key")
+                transmit_buffer.put([error_handler(3), addr])
         else:
-            logging.error("Unspecified Deletion command")
-            error_buffer.put([7, addr])
+            logging.error("DECODER :: Unspecified Deletion command")
+            transmit_buffer.put([error_handler(7), addr])
 
     elif packet_id == 2:
         # Remove an Item from database
+        # Not necessary to return anything for this function
         if verify_key(username, packet['private'], public=False):
             user = retrieve_user(username)
             if user is None:
-                logging.error("User not found in the database")
-                error_buffer.put([17, addr])
+                logging.error("DECODER :: User not found in the database")
+                transmit_buffer.put([error_handler(17), addr])
                 return
             if isinstance(packet['Key'], str):
                 if not user.remove_from_inventory(packet['Key']):
-                    logging.error("Key not found in Library")
-                    logging.error("Sending Error to:", addr)
-                    error_buffer.put([8, addr])
+                    logging.error("DECODER :: Key not found in Library")
+                    logging.error("DECODER :: Sending Error to:", addr)
+                    transmit_buffer.put([error_handler(8), addr])
+                else:
+                    transmit_buffer.put([error_handler(0), addr])
             elif isinstance(packet['Key'], list):
                 for item in packet['Key']:
                     if not user.remove_from_inventory(item):
-                        logging.error("Key not found in Library")
-                        logging.error("Sending Error to:", addr)
-                        error_buffer.put([8, addr])
+                        logging.error("DECODER :: Key not found in Library")
+                        logging.error("DECODER :: Sending Error to:", addr)
+                        transmit_buffer.put([error_handler(8), addr])
+                    else:
+                        transmit_buffer.put([error_handler(0), addr])
             else:
-                logging.error("Value not acceptable data type")
-                error_buffer.put([20, addr])
+                logging.error("DECODER :: Value not acceptable data type")
+                transmit_buffer.put([error_handler(20), addr])
             user.to_file()
         else:
-            logging.error("Incorrect private Key")
-            error_buffer.put([3, addr])
+            logging.error("DECODER :: Incorrect private Key")
+            transmit_buffer.put([error_handler(3), addr])
 
     elif packet_id == 3:
         # Add an Item to database
+        # Not necessary to return anything for this function
         if verify_key(username, packet['private'], public=False):
             packet.pop("private")
             user = retrieve_user(username)
             if user is None:
-                logging.error("User not found in the database")
-                error_buffer.put([17, addr])
+                logging.error("DECODER :: User not found in the database")
+                transmit_buffer.put([error_handler(17), addr])
                 return
             for key, value in packet.items():
                 user.add_to_inventory({key: value})
             user.to_file()
+            transmit_buffer.put([error_handler(0), addr])
         else:
-            logging.error("Incorrect private Key")
-            error_buffer.put([3, addr])
+            logging.error("DECODER :: Incorrect private Key")
+            transmit_buffer.put([error_handler(3), addr])
 
     elif packet_id == 4:
         # Send all the Users' Data to the user
-
+        # Instead of a Zero code, it'll return the asked for information.
         if verify_key(username, packet['public'], public=True):
             if packet['Library'] == 1:
                 user = retrieve_user(username)
                 if user is None:
-                    logging.error("User not found in the database")
-                    error_buffer.put([17, addr])
+                    logging.error("DECODER :: User not found in the database")
+                    transmit_buffer.put([error_handler(17), addr])
                     return
+                # Send back the user's data
                 transmit_buffer.put([user.send_items(list(user.Inventory.keys())), addr])
             else:
-                logging.error("Invalid Packet Format")
-                error_buffer.put([1, addr])
+                logging.error("DECODER :: Invalid Packet Format")
+                transmit_buffer.put([error_handler(1), addr])
         else:
-            prilogging.errornt("Incorrect private Key")
-            error_buffer.put([3, addr])
+            logging.error("DECODER :: Incorrect private Key")
+            transmit_buffer.put([error_handler(3), addr])
 
     elif packet_id == 5:
-        # send specific Data to the User
+        # Send specific Data to the User
+        # Instead of a Zero code, it'll return the asked for information.
         if verify_key(username, packet['public'], public=True):
-            packet.pop('Publid')
+            packet.pop('public')
             new_header = '@' + username + ':200'
             user = retrieve_user(username)
             if user is None:
-                logging.error("User not found in the database")
-                error_buffer.put([17, addr])
+                logging.error("DECODER :: User not found in the database")
+                transmit_buffer.put([error_handler(17), addr])
                 return
             new_packet = {}
             for key in list(packet.keys()):
                 try:
                     new_packet[key] = user.Inventory[key]
                 except KeyError:
-                    logging.error("Unable to find specific Key")
-                    error_buffer.put([8, addr])
-
+                    logging.error("DECODER :: Unable to find specific Key")
+                    transmit_buffer.put([error_handler(8), addr])
+                    return
+            # Send the user's data back
             transmit_buffer.put([new_header + ' ' + json.dumps(new_packet), addr])
         else:
-            logging.error("Incorrect private Key")
-            error_buffer.put([3, addr])
+            logging.error("DECODER :: Incorrect private Key")
+            transmit_buffer.put([error_handler(3), addr])
+            return
     elif packet_id == 6:
         # Update Item Ownership
         # Currently under development
         pass
+    elif packet_id == 7:
+        # Send Messages to the User
+        # Currently under development
+        pass
+    elif packet_id == 8:
+        # Send Exchanges to the User
+        # Currently under development
+        pass
+    logging.debug("DECODER :: Successfully decoded id: " + str(packet_id))
 
 
-def piped(username, packet_id, packet, addr, error_buffer, transmit_buffer):
+def piped(username, packet_id, packet, addr, transmit_buffer):
     """
     Piped commands. These are currently still being disputed on how they should be implimented
     :param username: Username of the subject
     :param packet_id: Packet identifier. Determines how the packet is handled
     :param packet: The actual packet dictionary
     :param addr: the IP address to return to
-    :param error_buffer:
     :param transmit_buffer:
     """
     if packet_id == 100:

@@ -8,6 +8,7 @@ from OpenSSL import crypto
 import unittest
 from time import sleep
 import os
+from networking import recv_until
 
 
 def generate_private_public_keypair():
@@ -38,44 +39,50 @@ class NetworkingTest(unittest.TestCase):
         self.test_username_1 = 'username_1'
         self.test_username_2 = 'username_2'
 
-    def dictionary_to_byte_string(self, dictionary):
+    @staticmethod
+    def dictionary_to_byte_string(dictionary):
         return json.dumps(dictionary)
 
     def send_buffer(self, send_buffer, end_byte=b'\x7F\xFF\x7F\xFF'):
         for thing in send_buffer:
             # Send Buffer
-            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-                s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-                s.connect((self.HOST, self.PORT))
-                s.sendall(thing.encode() + end_byte)
-                s.close()
+            s = socket.create_connection((self.HOST, self.PORT))
+            s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+            s.sendall(thing.encode() + end_byte)
             print("Sent:", re.match(r'(\@[\S]+)\:(\d+)', thing).groups())
-            time.sleep(.2)
+            # Wair for server clap back
+            time.sleep(1)
+            data = recv_until(s)
+            s.close()
+        return data
 
     def test_create_new_user(self):
         header = '@' + self.test_username_1 + ':0'
         packet = "{\"private\":\"" + self.private_key_1.decode() + "\", \"public\":\"" + self.public_key_1.decode() + "\"}"
-        self.send_buffer([header + ' ' + packet])
+        data_recv = self.send_buffer([header + ' ' + packet])
+        self.assertIn('!Error:0', data_recv)
         time.sleep(1)
         self.assertTrue(os.path.exists(os.path.join('db', 'username_1.json')))
 
         header = '@' + self.test_username_2 + ':0'
         packet = "{\"private\":\"" + self.private_key_2.decode() + "\", \"public\":\"" + self.public_key_2.decode() + "\"}"
-        self.send_buffer([header + ' ' + packet])
+        data_recv = self.send_buffer([header + ' ' + packet])
+        self.assertIn('!Error:0', data_recv)
         time.sleep(1)
         self.assertTrue(os.path.exists(os.path.join('db', 'username_2.json')))
-
 
     def test_delete_new_user(self):
         header = '@' + self.test_username_1 + ':1'
         packet = "{\"Delete\":1, \"public\":\"" + self.public_key_1.decode() + "\", \"private\":\"" + self.private_key_1.decode() + "\"}"
-        self.send_buffer([header + ' ' + packet])
+        data_recv = self.send_buffer([header + ' ' + packet])
+        self.assertIn('!Error:0', data_recv)
         time.sleep(1)
         self.assertFalse(os.path.exists(os.path.join('db', 'username_1.json')))
 
         header = '@' + self.test_username_2 + ':1'
         packet = "{\"Delete\":1, \"public\":\"" + self.public_key_2.decode() + "\", \"private\":\"" + self.private_key_2.decode() + "\"}"
-        self.send_buffer([header + ' ' + packet])
+        data_recv = self.send_buffer([header + ' ' + packet])
+        self.assertIn('!Error:0', data_recv)
         time.sleep(1)
         self.assertFalse(os.path.exists(os.path.join('db', 'username_2.json')))
 
@@ -87,9 +94,9 @@ class NetworkingTest(unittest.TestCase):
             packet = '{"Key":"' + key + '", "private": "' + self.private_key_1.decode() + '"}'
             send_buffer.append(header + ' ' + packet)
 
-        self.send_buffer(send_buffer)
-        # time.sleep(1)
-        # self.assertIn()
+        data_recv = self.send_buffer(send_buffer)
+        self.assertIn('!Error:0', data_recv)
+        time.sleep(1)
 
     def test_delete_many_db_item(self):
         header = '@' + self.test_username_1 + ':2'
@@ -100,7 +107,8 @@ class NetworkingTest(unittest.TestCase):
         packet = packet[:-1]
         packet += '], "private": "' + self.private_key_1.decode() + '"}'
 
-        self.send_buffer([header + ' ' + packet])
+        data_recv = self.send_buffer([header + ' ' + packet])
+        self.assertIn('!Error:0', data_recv)
 
     def test_add_db_item(self):
         send_buffer = []
@@ -110,7 +118,8 @@ class NetworkingTest(unittest.TestCase):
             packet = '{"' + key + '":' + self.dictionary_to_byte_string(value) + ', "private": "' + self.private_key_1.decode() + '"}'
             send_buffer.append(header + ' ' + packet)
 
-        self.send_buffer(send_buffer)
+        data_recv = self.send_buffer(send_buffer)
+        self.assertIn('!Error:0', data_recv)
 
     def test_add_many_db_item(self):
         header = '@' + self.test_username_1 + ':3'
@@ -119,7 +128,8 @@ class NetworkingTest(unittest.TestCase):
             packet += '"' + key + '":' + self.dictionary_to_byte_string(value) + ', '
         packet += '"private": "' + self.private_key_1.decode() + '"}'
 
-        self.send_buffer([header + ' ' + packet])
+        data_recv = self.send_buffer([header + ' ' + packet])
+        self.assertIn('!Error:0', data_recv)
 
     def test_recieve_all_data(self):
         header = '@' + self.test_username_1 + ':4'
@@ -127,12 +137,16 @@ class NetworkingTest(unittest.TestCase):
         self.send_buffer([header + ' ' + packet])
 
     def test_recieve_some_data(self):
-        header = '@' + self.test_username_1 + ':4'
-        packet = ''
-        for key, value in self.Items.items():
-            packet += '"' + key + '": 1, '
-        packet += '"public":"' + self.public_key_1.decode() + '"}'
-        self.send_buffer([header + ' ' + packet])
+        header = '@' + self.test_username_1 + ':5'
+        packet = {}
+        keys = []
+        for key in list(self.Items.keys())[:5]:
+            packet[key] = 1
+            keys.append(key)
+        packet["public"] = self.public_key_1.decode()
+        data_recv = self.send_buffer([header + ' ' + self.dictionary_to_byte_string(packet)])
+        for k in keys:
+            self.assertIn(k, data_recv)
 
     def test_ownership_change(self):
         # TODO: Impliment Test Here
@@ -145,6 +159,10 @@ class NetworkingTest(unittest.TestCase):
 
         # Add all items to user 1
         self.test_add_many_db_item()
+        input(format("Press Enter to Continue", '^100s'))
+
+        # Verify they Exist in username_1's inventory
+        self.test_recieve_some_data()
         input(format("Press Enter to Continue", '^100s'))
 
         # Remove Items

@@ -2,8 +2,7 @@
 
 from multiprocessing import Process, SimpleQueue
 from database import auto_backup
-from errors import error_handler
-from networking import network_main
+from networking import network_main, network_transmit
 from decoder import decoding
 from logger import STOP
 import logging
@@ -19,12 +18,11 @@ if __name__ == '__main__':
     # Set three infinite running tasks.
     # 1) Listen on the network for data
     # 2) Listen on the Decoding Queue to interpret data
-    # 3) Listen on the Error Queue to send return messages
-    # 4) Scheduled backups
+    # 3) Scheduled backups
     runnables = [
-        Process(target=network_main, args=tuple((decode_buffer, error_buffer))),
-        Process(target=decoding, args=tuple((decode_buffer, error_buffer, transmit_buffer))),
-        Process(target=error_handler, args=iter((error_buffer, transmit_buffer))),
+        Process(target=network_main, args=tuple([decode_buffer, transmit_buffer])),
+        Process(target=decoding, args=tuple((decode_buffer, transmit_buffer))),
+        Process(target=network_transmit, args=[transmit_buffer]),
         Process(target=auto_backup)]
     # Run the tasks
     for r in runnables:
