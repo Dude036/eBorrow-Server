@@ -96,7 +96,6 @@ class NetworkingTest(unittest.TestCase):
 
         data_recv = self.send_buffer(send_buffer)
         self.assertIn('!Error:0', data_recv)
-        time.sleep(1)
 
     def test_delete_many_db_item(self):
         header = '@' + self.test_username_1 + ':2'

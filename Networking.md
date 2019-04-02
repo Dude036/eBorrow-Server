@@ -240,6 +240,16 @@ The Type Info varies based on the category and the sub category. So far, we've i
 
 *These are still be actively worked on and implimented*
 
+The current system implimented is designed to acknowledge to the client that everything is being handled. Once a request is resolved on the server, the server will respond with an two possible options. 
+
+- Option 1: An Error Packet
+	- This options happens when there is either no response necessary, such as adding a new user, or when an error occured, see the below table
+
+- Option 2: An Regular Packet (as specificed above)
+	- This options happens when there is a reponse required, such as in a send all command, and only occurs if there is no error in processing the request
+
+The Error Packet 0 is special. This happens when a command is correctly processed, but requires no response. In a way, the Error packet 0, and the Regular packet are handled the same way. If any other error packet is returned, then there needs to be action take from either the client of the user.
+
 0. No error, Successful Execution
 
 1. Invalid Packet Format

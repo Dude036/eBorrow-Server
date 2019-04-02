@@ -33,8 +33,6 @@ def decoding(decode_buffer, transmit_buffer):
         logging.info("DECODER :: Extracting User Information")
 
         # Split the item into Header and Packet
-        header = None
-        packet = None
         match = re.match(r'([^ ]*) (.*)', item)
         if match is not None:
             header = match.group(1)
