@@ -74,6 +74,15 @@ class User(object):
         for key, value in lib_item.items():
             self.Inventory.update({key: value})
 
+    # TODO: Add this to the User Class
+    def ownership_change(item_key, former_owner, future_owner):
+        """ ownership_change
+        item_key: str: Some Item key in the database of former owner
+        former_owner: str: username of the former owner of the item
+        future_owner: str: username of the new item recipient
+        """
+        pass
+
     def remove_from_inventory(self, lib_key):
         """
 
@@ -128,6 +137,8 @@ class User(object):
 		for exchange in self.Exchange:
 			packet += json.dumps(self.Exchange[exchange]) + ',' + '}'
         return header + ' ' + packet
+
+
 
 
 if __name__ == '__main__':

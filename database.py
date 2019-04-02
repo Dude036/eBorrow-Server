@@ -138,15 +138,6 @@ def delete_user(name):
         return False
 
 
-# TODO: Add this to the User Class
-def ownership_change(item_key, former_owner, future_owner):
-    """ ownership_change
-    item_key: str: Some Item key in the database of former owner
-    former_owner: str: username of the former owner of the item
-    future_owner: str: username of the new item recipient 
-    """
-    pass
-
 
 if __name__ == '__main__':
     backup_libraries()
