@@ -72,7 +72,7 @@ These are interpreted commands that edits the database in some manner or form. T
 			@username:6
 		Packet:
             {
-                "SHA_256 Hash of item": 1, 
+                "Key": "SHA_256 Hash of item", 
                 "New Owner": "friend_username",
                 "public": "Friends_Public_key",
                 "private": "Username_Private_key",

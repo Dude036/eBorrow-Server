@@ -234,8 +234,53 @@ def interpretted(username, packet_id, packet, addr, transmit_buffer):
             return
     elif packet_id == 6:
         # Update Item Ownership
-        # Currently under development
-        pass
+        # Returns an error Packet
+        # Extract Owner's User object and verify private Key
+        try:
+            owner_key = packet.pop('private')
+        except KeyError:
+            logging.error("DECODER :: Missing Private Key from Json object")
+            transmit_buffer.put([error_handler(7), addr])
+            return
+
+        if verify_key(username, owner_key, public=False):
+            owner = retrieve_user(username)
+            if owner is None:
+                logging.error("DECODER :: User not found in the database")
+                transmit_buffer.put([error_handler(17), addr])
+                return
+            # Extract Borrower's User object and verify public Key
+            try:
+                borrower_key = packet.pop('public')
+                borrower_username = packet.pop('New Owner')
+            except KeyError:
+                logging.error("DECODER :: Missing public Key or New Owner from Json object")
+                transmit_buffer.put([error_handler(7), addr])
+                return
+            if verify_key(borrower_username, borrower_key, public=True):
+                borrower = retrieve_user(username)
+                if borrower is None:
+                    logging.error("DECODER :: User not found in the database")
+                    transmit_buffer.put([error_handler(17), addr])
+                    return
+                # Get the Hash and Schedule
+                try:
+                    schedule = packet.pop('Schedule')
+                    item_key = packet.pop('Key')
+                except KeyError:
+                    logging.error("DECODER :: Missing Schedule or key from Json object")
+                    transmit_buffer.put([error_handler(7), addr])
+                    return
+                ret_code = owner.ownership_change(borrower, item_key, schedule)
+                transmit_buffer.put([error_handler(ret_code), addr])
+            else:
+                logging.error("DECODER :: Incorrect Friend public Key")
+                transmit_buffer.put([error_handler(3), addr])
+                return
+        else:
+            logging.error("DECODER :: Incorrect User private Key")
+            transmit_buffer.put([error_handler(3), addr])
+            return
     elif packet_id == 7:
         # Send Messages to the User
         # Currently under development
