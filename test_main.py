@@ -137,12 +137,16 @@ class NetworkingTest(unittest.TestCase):
         self.send_buffer([header + ' ' + packet])
 
     def test_recieve_some_data(self):
-        header = '@' + self.test_username_1 + ':4'
-        packet = ''
-        for key, value in self.Items.items():
-            packet += '"' + key + '": 1, '
-        packet += '"public":"' + self.public_key_1.decode() + '"}'
-        self.send_buffer([header + ' ' + packet])
+        header = '@' + self.test_username_1 + ':5'
+        packet = {}
+        keys = []
+        for key in list(self.Items.keys())[:5]:
+            packet[key] = 1
+            keys.append(key)
+        packet["public"] = self.public_key_1.decode()
+        data_recv = self.send_buffer([header + ' ' + self.dictionary_to_byte_string(packet)])
+        for k in keys:
+            self.assertIn(k, data_recv)
 
     def test_ownership_change(self):
         # TODO: Impliment Test Here
@@ -155,6 +159,10 @@ class NetworkingTest(unittest.TestCase):
 
         # Add all items to user 1
         self.test_add_many_db_item()
+        input(format("Press Enter to Continue", '^100s'))
+
+        # Verify they Exist in username_1's inventory
+        self.test_recieve_some_data()
         input(format("Press Enter to Continue", '^100s'))
 
         # Remove Items

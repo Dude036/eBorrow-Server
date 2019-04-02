@@ -213,7 +213,7 @@ def interpretted(username, packet_id, packet, addr, transmit_buffer):
         # Send specific Data to the User
         # Instead of a Zero code, it'll return the asked for information.
         if verify_key(username, packet['public'], public=True):
-            packet.pop('Public')
+            packet.pop('public')
             new_header = '@' + username + ':200'
             user = retrieve_user(username)
             if user is None:

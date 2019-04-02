@@ -33,7 +33,7 @@ def construct_error(code):
     if code == 0:
         return '!Error:0 {}'
     elif code not in list(ERROR_CODES.keys()):
-        logging.debug("Error Code passed not found")
+        logging.debug("ERR HAN :: Error Code passed not found")
         return '!Error:99 {"Description":"' + ERROR_CODES[99] + '"}'
     else:
         return '!Error:' + str(code) + ' {"Description":"' + ERROR_CODES[code] + '"}'
@@ -41,11 +41,11 @@ def construct_error(code):
 
 def error_handler(code):
     if code not in list(ERROR_CODES.keys()):
-        logging.warning("Error Code " + str(code) + " Not found")
+        logging.warning("ERR HAN :: Error Code " + str(code) + " Not found")
         code = 99
 
     if code != 0:
-        logging.error("Error Code Received: %i" % code)
+        logging.error("ERR HAN :: Error Code Received: %i" % code)
     return construct_error(code)
 
 
