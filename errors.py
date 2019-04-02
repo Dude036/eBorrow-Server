@@ -4,6 +4,7 @@ Error Handler
 '''
 
 ERROR_CODES = {
+    0: 'All Clear',
     1: 'Invalid Packet Format',
     2: 'Invalid/Unrecognized Packet ID',
     3: 'Invalid User Private Key',
@@ -28,16 +29,23 @@ ERROR_CODES = {
 }
 
 
-def error_handler(error_buffer, transmit_buffer):
-    # global error_buffer
-    while True:
-        code, addr = error_buffer.get()
-        logging.info("Starting Error Notification")
-        if code not in list(ERROR_CODES.keys()):
-            logging.warning("Error Code Not found")
-            code = 99
+def construct_error(code):
+    if code == 0:
+        return '!Error:0 {}'
+    elif code not in list(ERROR_CODES.keys()):
+        logging.debug("Error Code passed not found")
+        return '!Error:99 {"Description":"' + ERROR_CODES[99] + '"}'
+    else:
+        return '!Error:' + str(code) + ' {"Description":"' + ERROR_CODES[code] + '"}'
 
-        # Valid Key, set to the Key reference
-        print("Code:", code)
-        print("Message:", ERROR_CODES[code])
+
+def error_handler(code):
+    if code not in list(ERROR_CODES.keys()):
+        logging.warning("Error Code " + str(code) + " Not found")
+        code = 99
+
+    if code != 0:
+        logging.error("Error Code Received: %i" % code)
+    return construct_error(code)
+
 

@@ -2,10 +2,17 @@
 import socket
 import time
 import logging
+from errors import error_handler
 
 END_BYTE = b'\x7F\xFF\x7F\xFF'
 BUFF_SIZE = 8192
-PORT = 41111		# Port to listen on (non-privileged ports are > 1023)
+HOST = '127.0.0.1'          # Localhost for testing
+# HOST = '172.31.38.104'	    # AWS testing
+# HOST = '24.11.13.224'	    # Accepts outside traffic !!THIS NEEDS TO STAY!!
+PORT = 41111		        # Port to listen on (non-privileged ports are > 1023)
+mySocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+mySocket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+mySocket.bind((HOST, PORT))
 
 
 def recv_until(sock):
@@ -35,42 +42,42 @@ def recv_until(sock):
     return ''.join([thing.decode() for thing in total_data])
 
 
-def network_main(decode_buffer, error_buffer):
-    HOST = '127.0.0.1'			# Localhost for testing
-    # HOST = '172.31.38.104'	    # AWS testing
-    # HOST = '192.168.1.166'	    # Accepts outside traffic !!THIS NEEDS TO STAY!!
+def network_main(decode_buffer, transmit_buffer):
     data = ''
-
     while True:
-        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-            s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-            # Setup
-            s.bind((HOST, PORT))
-            s.listen()
-            conn, addr = s.accept()
-            # Got a connection.
-            with conn:
-                logging.debug('Connected by %s' % str(addr))
-                try:
-                    data = recv_until(conn)
-                    if data == '':
-                        logging.error("Unterminated string received")
-                        error_buffer.put([18, addr])
-                    else:
-                        # Send off to Decode
-                        logging.info("Received Length: %s" % len(data))
-                        decode_buffer.put([data, addr])
-                except Exception as e:
-                    logging.debug(type(e))
-                    logging.debug(e.args)
-                    logging.debug(e)
+        mySocket.listen()
+        conn, addr = mySocket.accept()
+        # Got a connection.
+        with conn:
+            logging.debug('NETWORK :: Connected by %s' % str(addr))
+            try:
+                data = recv_until(conn)
+                # conn.detach()
+                if data == '':
+                    logging.error('NETWORK :: Unterminated string received')
+                    transmit_buffer.put([error_handler(18), conn])
+                else:
+                    # Send off to Decode
+                    logging.info('NETWORK :: Received Length: ' + str(len(data)))
+                    decode_buffer.put([data, conn])
+            except Exception as e:
+                logging.error('NETWORK :: Exception caught in network_main: ')
+                logging.error(type(e))
+                logging.error(e.args)
+                logging.error(e)
 
 
 def network_transmit(transmit_buffer):
+    time.sleep(.2)
     while True:
-        data, addr = transmit_buffer.get()
-        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-            s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-            s.connect((addr, PORT))
-            s.sendall(data.encode() + END_BYTE)
-            s.close()
+        try:
+            data, conn = transmit_buffer.get()
+            logging.info('NETWORK :: Starting Transmission to ' + str(conn))
+            # conn.connect(conn)
+            conn.sendall(data.encode() + END_BYTE)
+            conn.close()
+        except OSError as e:
+            logging.error('NETWORK :: Broken Pipe?')
+            logging.error(type(e))
+            logging.error(e.args)
+            logging.error(e)
