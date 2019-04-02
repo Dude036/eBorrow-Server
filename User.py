@@ -124,7 +124,9 @@ class User(object):
         """
         header = '@' + self.Username + ':201'
         # TODO: Build an Exchange translator
-        packet = str(self.Exchange)
+        packet = '{'
+		for exchange in self.Exchange:
+			packet += json.dumps(self.Exchange[exchange]) + ',' + '}'
         return header + ' ' + packet
 
 
