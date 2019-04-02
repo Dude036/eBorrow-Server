@@ -26,9 +26,10 @@ class NetworkingTest(unittest.TestCase):
     """docstring for NetworkingTest"""
     def __init__(self):
         super(NetworkingTest, self).__init__()
-        self.HOST = '127.0.0.1'          # Local Host Testing
-        # HOST = '3.90.142.252'         # AWS Testing
-        self.PORT = 41111                # The port used by the server
+        # self.HOST = '127.0.0.1'           # Local Host Testing
+        self.HOST = '24.11.13.224'          # Home Network
+        self.PORT = 41111                   # The port used by the server
+        self.Remote = True                  # This should be false if you're testing on a local network
 
         self.Items = json.load(open("db.json", 'r'))
         print("Generating Key Pairs")
@@ -61,30 +62,42 @@ class NetworkingTest(unittest.TestCase):
         packet = "{\"private\":\"" + self.private_key_1.decode() + "\", \"public\":\"" + self.public_key_1.decode() + "\"}"
         data_recv = self.send_buffer([header + ' ' + packet])
         self.assertIn('!Error:0', data_recv)
-        time.sleep(1)
-        self.assertTrue(os.path.exists(os.path.join('db', 'username_1.json')))
+        if self.Remote:
+            pass
+        else:
+            time.sleep(1)
+            self.assertTrue(os.path.exists(os.path.join('db', 'username_1.json')))
 
         header = '@' + self.test_username_2 + ':0'
         packet = "{\"private\":\"" + self.private_key_2.decode() + "\", \"public\":\"" + self.public_key_2.decode() + "\"}"
         data_recv = self.send_buffer([header + ' ' + packet])
         self.assertIn('!Error:0', data_recv)
-        time.sleep(1)
-        self.assertTrue(os.path.exists(os.path.join('db', 'username_2.json')))
+        if self.Remote:
+            pass
+        else:
+            time.sleep(1)
+            self.assertTrue(os.path.exists(os.path.join('db', 'username_2.json')))
 
     def test_delete_new_user(self):
         header = '@' + self.test_username_1 + ':1'
         packet = "{\"Delete\":1, \"public\":\"" + self.public_key_1.decode() + "\", \"private\":\"" + self.private_key_1.decode() + "\"}"
         data_recv = self.send_buffer([header + ' ' + packet])
         self.assertIn('!Error:0', data_recv)
-        time.sleep(1)
-        self.assertFalse(os.path.exists(os.path.join('db', 'username_1.json')))
+        if self.Remote:
+            pass
+        else:
+            time.sleep(1)
+            self.assertFalse(os.path.exists(os.path.join('db', 'username_1.json')))
 
         header = '@' + self.test_username_2 + ':1'
         packet = "{\"Delete\":1, \"public\":\"" + self.public_key_2.decode() + "\", \"private\":\"" + self.private_key_2.decode() + "\"}"
         data_recv = self.send_buffer([header + ' ' + packet])
         self.assertIn('!Error:0', data_recv)
-        time.sleep(1)
-        self.assertFalse(os.path.exists(os.path.join('db', 'username_2.json')))
+        if self.Remote:
+            pass
+        else:
+            time.sleep(1)
+            self.assertFalse(os.path.exists(os.path.join('db', 'username_2.json')))
 
     def test_delete_db_item(self):
         send_buffer = []
