@@ -283,8 +283,20 @@ def interpretted(username, packet_id, packet, addr, transmit_buffer):
             return
     elif packet_id == 7:
         # Send Messages to the User
-        # Currently under development
-        pass
+        # Requires a clap back
+        try:
+            user_key = packet.pop("private")
+        except KeyError:
+            logging.error("DECODER :: Missing private key from Json object")
+            transmit_buffer.put([error_handler(7), addr])
+            return
+        if verify_key(username, user_key, public=False):
+            user = retrieve_user(username)
+            transmit_buffer.put([user.send_messages(), addr])
+        else:
+            logging.error("DECODER :: Incorrect User private Key")
+            transmit_buffer.put([error_handler(3), addr])
+            return
     elif packet_id == 8:
         # Send Exchanges to the User
         # Currently under development
