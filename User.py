@@ -141,10 +141,10 @@ class User(object):
         :return: A string ready to be sent back to the user
         """
         header = '@' + self.Username + ':201'
-        # TODO: Build an Exchange translator
+        #TODO: Build an Exchange translator
         packet = '{'
-		for exchange in self.Exchange:
-			packet += json.dumps(self.Exchange[exchange]) + ',' + '}'
+        for exchange in self.Exchange:
+            packet += json.dumps(self.Exchange[exchange]) + ',' + '}'
         return header + ' ' + packet
 
 
