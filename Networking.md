@@ -98,6 +98,15 @@ These are interpreted commands that edits the database in some manner or form. T
 		Packet:
 			{"Exchanges": 1, "private":Private_key}
 
+* Clear All Messages
+
+		Header:
+			@your_username:9
+		Packet:
+			{"Messages": -1, "private":Private_key}
+
+**NOTE**: This will delete all messages from the user's account, and there is now verification on the server end to verify that they want to do that. Once it's send, it's done
+
 #### Piped Commands
 
 These commands are only read by the server, and are stored in a buffer. Whenever the target user connects with the database, the command is then sent. All piped commands have a packet identifier between 100 and 199.
