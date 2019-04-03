@@ -301,6 +301,25 @@ def interpretted(username, packet_id, packet, addr, transmit_buffer):
         # Send Exchanges to the User
         # Currently under development
         pass
+    elif packet_id == 9:
+        # Delete all the User's messages
+        # Returns and Error Packet
+        try:
+            user_key = packet.pop("private")
+        except KeyError:
+            logging.error("DECODER :: Missing private key from Json object")
+            transmit_buffer.put([error_handler(7), addr])
+            return
+        if verify_key(username, user_key, public=False):
+            logging.info("DECODER :: Deleted " + username + "'s messages per request")
+            user = retrieve_user(username)
+            user.clear_messages()
+            transmit_buffer.put([error_handler(0), addr])
+        else:
+            logging.error("DECODER :: Incorrect User private Key")
+            transmit_buffer.put([error_handler(3), addr])
+            return
+
     logging.debug("DECODER :: Successfully decoded id: " + str(packet_id))
 
 
