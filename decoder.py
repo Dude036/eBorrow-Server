@@ -103,8 +103,8 @@ def interpretted(username, packet_id, packet, addr, transmit_buffer):
     :param username: Username of the subject
     :param packet_id: Packet identifier. Determines how the packet is handled
     :param packet: The actual packet dictionary
-    :param addr: the IP address to return to
-    :param transmit_buffer:
+    :param addr: the connection object to return to
+    :param transmit_buffer: This is the buffer to send information back to the user
     """
     if packet_id == 0:
         # New User Application
@@ -329,8 +329,8 @@ def piped(username, packet_id, packet, addr, transmit_buffer):
     :param username: Username of the subject
     :param packet_id: Packet identifier. Determines how the packet is handled
     :param packet: The actual packet dictionary
-    :param addr: the IP address to return to
-    :param transmit_buffer:
+    :param addr: the connection object to return to
+    :param transmit_buffer: This is the buffer to send information back to the user
     """
     if packet_id == 100:
         # Acquisition Request
