@@ -150,7 +150,6 @@ def interpretted(username, packet_id, packet, addr, transmit_buffer):
             if isinstance(packet['Key'], str):
                 if not user.remove_from_inventory(packet['Key']):
                     logging.error("DECODER :: Key not found in Library")
-                    logging.error("DECODER :: Sending Error to:", addr)
                     transmit_buffer.put([error_handler(8), addr])
                 else:
                     transmit_buffer.put([error_handler(0), addr])
