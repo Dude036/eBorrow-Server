@@ -57,7 +57,7 @@ These are interpreted commands that edits the database in some manner or form. T
 		Header:
 			@username:4
 		Packet:
-			{"public":Public_key}
+			{"public":Public_key, "Library": 1}
 
 * Send Specific Data
 

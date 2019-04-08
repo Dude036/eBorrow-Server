@@ -26,10 +26,10 @@ class NetworkingTest(unittest.TestCase):
     """docstring for NetworkingTest"""
     def __init__(self):
         super(NetworkingTest, self).__init__()
-        # self.HOST = '127.0.0.1'           # Local Host Testing
-        self.HOST = '24.11.13.224'          # Home Network
+        self.HOST = '127.0.0.1'           # Local Host Testing
+        # self.HOST = '24.11.13.224'          # Home Network
         self.PORT = 41111                   # The port used by the server
-        self.Remote = True                  # This should be false if you're testing on a local network
+        self.Remote = False                  # This should be false if you're testing on a local network
 
         self.Items = json.load(open("db.json", 'r'))
         print("Generating Key Pairs")
