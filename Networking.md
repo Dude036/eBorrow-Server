@@ -14,6 +14,8 @@ The Header and the Packet are separated by the space character, " ". At the end 
 
 Every header follows a similar structure of having the username and the packet identifier. This allows for expandable transmission protocols to be made. The range of which is specified in the following sections.
 
+Each command will recieve exactly one response. The server will terminate the connection once the response has been recieved. Unless specified, assume that response will be an error packet.
+
 #### Interpreted Commands
 
 These are interpreted commands that edits the database in some manner or form. Therefore, they are slower in execution. These command packet identifiers range from any number between 0 and 99.
@@ -52,19 +54,23 @@ These are interpreted commands that edits the database in some manner or form. T
 **NOTE**: This can be used to retrieve many items from the database, simply add more key, value pairs to the json object. There need only be one "private" key.
 
 
-* Send All Data
+* Send All Inventory Data
 
 		Header:
 			@username:4
 		Packet:
 			{"public":Public_key, "Library": 1}
 
-* Send Specific Data
+*Response:* This command sends back packet ID 200 which means that your command was properly executed. If there was an error while processing, an error packet will be generated.
+
+* Send Specific Inventory Data
 
 		Header:
 			@username:5
 		Packet:
 			{"SHA_256 Hash of item": 1, "public":Public_key}
+
+*Response:* This command sends back packet ID 200 which means that your command was properly executed. If there was an error while processing, an error packet will be generated.
 
 * Item Current Ownership Update
 
@@ -91,12 +97,16 @@ These are interpreted commands that edits the database in some manner or form. T
 		Packet:
 			{"Messages": 1, "private":Private_key}
 
+*Response:* This command sends back packet ID 200 which means that your command was properly executed. If there was an error while processing, an error packet will be generated.
+
 * Send Exchanges
 
 		Header:
 			@your_username:8
 		Packet:
 			{"Exchanges": 1, "private":Private_key}
+
+*Response:* This command sends back packet ID 200 which means that your command was properly executed. If there was an error while processing, an error packet will be generated.
 
 * Clear All Messages
 
@@ -257,7 +267,7 @@ The current system implimented is designed to acknowledge to the client that eve
 - Option 2: An Regular Packet (as specificed above)
 	- This options happens when there is a reponse required, such as in a send all command, and only occurs if there is no error in processing the request
 
-The Error Packet 0 is special. This happens when a command is correctly processed, but requires no response. In a way, the Error packet 0, and the Regular packet are handled the same way. If any other error packet is returned, then there needs to be action take from either the client of the user.
+The Error Packet 0 is special. This happens when a command is correctly processed, but requires no response. In a way, the Error packet 0, and the Regular Server Transmitted packets are handled the same way. If any other error packet is returned, then there needs to be action take from either the client or the user.
 
 0. No error, Successful Execution
 
