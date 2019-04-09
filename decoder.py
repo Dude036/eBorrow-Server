@@ -1,5 +1,5 @@
 import re
-from database import add_user, delete_user, ownership_change, retrieve_user
+# from database import add_user, delete_user, ownership_change, retrieve_user
 import simplejson as json
 from errors import error_handler
 import hashlib
