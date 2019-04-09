@@ -80,7 +80,7 @@ def backup_libraries():
     # For Every File in the database directory ending with json
     for file in os.listdir("db"):
         if file.endswith(".json"):
-            logging.info("Backing up: %s" %file)
+            logging.info("Backing up: %s" % file)
             # Dump the file in the backup folder as a json file
             class_output = retrieve_user(file)
             if class_output is not None:
@@ -136,7 +136,6 @@ def delete_user(name):
     else:
         logging.info("The file does not exist")
         return False
-
 
 
 if __name__ == '__main__':

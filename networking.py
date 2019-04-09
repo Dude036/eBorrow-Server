@@ -58,7 +58,8 @@ def network_main(decode_buffer, transmit_buffer):
                     transmit_buffer.put([error_handler(18), conn])
                 else:
                     # Send off to Decode
-                    logging.info('NETWORK :: Received Length: ' + str(len(data)))
+                    logging.info(
+                        'NETWORK :: Received Length: ' + str(len(data)))
                     decode_buffer.put([data, conn])
             except Exception as e:
                 logging.error('NETWORK :: Exception caught in network_main: ')

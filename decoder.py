@@ -198,7 +198,8 @@ def interpretted(username, packet_id, packet, addr, transmit_buffer):
                     transmit_buffer.put([error_handler(17), addr])
                     return
                 # Send back the user's data
-                transmit_buffer.put([user.send_items(list(user.Inventory.keys())), addr])
+                transmit_buffer.put(
+                    [user.send_items(list(user.Inventory.keys())), addr])
             else:
                 logging.error("DECODER :: Invalid Packet Format")
                 transmit_buffer.put([error_handler(1), addr])
@@ -226,7 +227,8 @@ def interpretted(username, packet_id, packet, addr, transmit_buffer):
                     transmit_buffer.put([error_handler(8), addr])
                     return
             # Send the user's data back
-            transmit_buffer.put([new_header + ' ' + json.dumps(new_packet), addr])
+            transmit_buffer.put(
+                [new_header + ' ' + json.dumps(new_packet), addr])
         else:
             logging.error("DECODER :: Incorrect private Key")
             transmit_buffer.put([error_handler(3), addr])
@@ -253,7 +255,8 @@ def interpretted(username, packet_id, packet, addr, transmit_buffer):
                 borrower_key = packet.pop('public')
                 borrower_username = packet.pop('New Owner')
             except KeyError:
-                logging.error("DECODER :: Missing public Key or New Owner from Json object")
+                logging.error(
+                    "DECODER :: Missing public Key or New Owner from Json object")
                 transmit_buffer.put([error_handler(7), addr])
                 return
             if verify_key(borrower_username, borrower_key, public=True):
@@ -267,7 +270,8 @@ def interpretted(username, packet_id, packet, addr, transmit_buffer):
                     schedule = packet.pop('Schedule')
                     item_key = packet.pop('Key')
                 except KeyError:
-                    logging.error("DECODER :: Missing Schedule or key from Json object")
+                    logging.error(
+                        "DECODER :: Missing Schedule or key from Json object")
                     transmit_buffer.put([error_handler(7), addr])
                     return
                 ret_code = owner.ownership_change(borrower, item_key, schedule)
@@ -310,7 +314,8 @@ def interpretted(username, packet_id, packet, addr, transmit_buffer):
             transmit_buffer.put([error_handler(7), addr])
             return
         if verify_key(username, user_key, public=False):
-            logging.info("DECODER :: Deleted " + username + "'s messages per request")
+            logging.info("DECODER :: Deleted " + username +
+                         "'s messages per request")
             user = retrieve_user(username)
             user.clear_messages()
             transmit_buffer.put([error_handler(0), addr])

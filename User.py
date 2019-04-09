@@ -58,13 +58,15 @@ class User(object):
         """
         Sends the database to a file
         """
-        json.dump(self.serialize(), open(os.path.join('db', self.Username + '.json'), 'w'))
+        json.dump(self.serialize(), open(
+            os.path.join('db', self.Username + '.json'), 'w'))
 
     def to_backup(self):
         """
         Sends the database to a file
         """
-        json.dump(self.serialize(), open(os.path.join('backup', self.Username + '.json'), 'w'), indent=2)
+        json.dump(self.serialize(), open(os.path.join(
+            'backup', self.Username + '.json'), 'w'), indent=2)
 
     def add_to_inventory(self, lib_item):
         """ add_to_library()
@@ -117,7 +119,8 @@ class User(object):
         packet = '{'
         for item in hash_list:
             try:
-                packet += '"' + item + '": ' + json.dumps(self.Inventory[item]) + ','
+                packet += '"' + item + '": ' + \
+                    json.dumps(self.Inventory[item]) + ','
             except KeyError as e:
                 logging.error("Item not in the database.")
                 logging.error(e)
@@ -148,17 +151,16 @@ class User(object):
         :return: A string ready to be sent back to the user
         """
         header = '@' + self.Username + ':201'
-        #TODO: Build an Exchange translator
+        # TODO: Build an Exchange translator
         packet = '{'
         for exchange in self.Exchange:
             packet += json.dumps(self.Exchange[exchange]) + ',' + '}'
         return header + ' ' + packet
 
 
-
-
 if __name__ == '__main__':
-    person_a = User('person_a', inventory={'key1': 1}, messages=['test'], exchange={})
+    person_a = User('person_a', inventory={
+                    'key1': 1}, messages=['test'], exchange={})
     print(person_a.serialize())
     person_b = User('person_b', json_data=person_a.serialize())
     print(person_b.serialize())

@@ -47,5 +47,3 @@ def error_handler(code):
     if code != 0:
         logging.error("ERR HAN :: Error Code Received: %i" % code)
     return construct_error(code)
-
-

@@ -20,7 +20,8 @@ if __name__ == '__main__':
     # 2) Listen on the Decoding Queue to interpret data
     # 3) Scheduled backups
     runnables = [
-        Process(target=network_main, args=tuple([decode_buffer, transmit_buffer])),
+        Process(target=network_main, args=tuple(
+            [decode_buffer, transmit_buffer])),
         Process(target=decoding, args=tuple((decode_buffer, transmit_buffer))),
         Process(target=network_transmit, args=[transmit_buffer]),
         Process(target=auto_backup)]
