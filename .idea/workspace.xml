@@ -2,8 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="c33194a6-646d-4b2b-84c7-9f89cd9159df" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/User.py" beforeDir="false" afterPath="$PROJECT_DIR$/User.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_main.py" beforeDir="false" afterPath="$PROJECT_DIR$/test_main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/Server.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/Server.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -27,32 +29,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/errors.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="250">
-              <caret line="33" column="26" selection-start-line="33" selection-start-column="26" selection-end-line="33" selection-end-column="26" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/database.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="867">
-              <caret line="138" selection-start-line="138" selection-end-line="138" />
-              <folding>
-                <element signature="e#20#29#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/User.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1054">
-              <caret line="149" lean-forward="true" selection-start-line="149" selection-end-line="149" />
-              <folding>
-                <element signature="e#0#25#0" expanded="true" />
-              </folding>
+            <state relative-caret-position="882">
+              <caret line="42" column="9" selection-start-line="42" selection-start-column="9" selection-end-line="42" selection-end-column="9" />
             </state>
           </provider>
         </entry>
@@ -60,7 +38,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/main.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="272">
+            <state relative-caret-position="336">
               <caret line="22" column="81" selection-start-line="22" selection-start-column="81" selection-end-line="22" selection-end-column="81" />
               <folding>
                 <element signature="e#20#68#0" expanded="true" />
@@ -69,11 +47,11 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/decoder.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2410">
-              <caret line="238" column="37" lean-forward="true" selection-start-line="238" selection-start-column="37" selection-end-line="238" selection-end-column="37" />
+            <state relative-caret-position="-708">
+              <caret line="199" column="43" selection-start-line="199" selection-start-column="43" selection-end-line="199" selection-end-column="43" />
               <folding>
                 <element signature="e#0#9#0" expanded="true" />
               </folding>
@@ -81,11 +59,11 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/networking.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1343">
-              <caret line="82" column="28" selection-start-line="82" selection-start-column="28" selection-end-line="82" selection-end-column="28" />
+            <state relative-caret-position="294">
+              <caret line="14" column="27" lean-forward="true" selection-start-line="14" selection-start-column="27" selection-end-line="14" selection-end-column="27" />
               <folding>
                 <element signature="e#19#32#0" expanded="true" />
               </folding>
@@ -96,8 +74,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/User.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="342">
-              <caret line="121" column="19" selection-start-line="121" selection-start-column="19" selection-end-line="121" selection-end-column="19" />
+            <state relative-caret-position="-2304">
+              <caret line="9" selection-start-line="9" selection-end-line="9" />
               <folding>
                 <element signature="e#0#25#0" expanded="true" />
               </folding>
@@ -108,8 +86,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/database.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="166">
-              <caret line="141" column="29" selection-start-line="141" selection-start-column="21" selection-end-line="141" selection-end-column="29" />
+            <state relative-caret-position="1743">
+              <caret line="83" column="63" selection-start-line="83" selection-start-column="63" selection-end-line="83" selection-end-column="63" />
               <folding>
                 <element signature="e#20#29#0" expanded="true" />
               </folding>
@@ -120,8 +98,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/test_main.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2386">
-              <caret line="151" column="35" selection-start-line="151" selection-start-column="35" selection-end-line="151" selection-end-column="35" />
+            <state relative-caret-position="189">
+              <caret line="21" column="34" selection-start-line="21" selection-start-column="34" selection-end-line="21" selection-end-column="34" />
               <folding>
                 <element signature="e#19#32#0" expanded="true" />
               </folding>
@@ -193,8 +171,18 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="ProjectPane">
+        <subPane>
+          <expand>
+            <path>
+              <item name="Server" type="b2602c69:ProjectViewProjectNode" />
+              <item name="Server" type="462c0819:PsiDirectoryNode" />
+            </path>
+          </expand>
+          <select />
+        </subPane>
+      </pane>
       <pane id="Scope" />
-      <pane id="ProjectPane" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -350,12 +338,12 @@
       <method v="2" />
     </configuration>
     <list>
-      <item itemvalue="Python.test_main" />
-      <item itemvalue="Python.main" />
-      <item itemvalue="Python.database" />
       <item itemvalue="Python.User" />
-      <item itemvalue="Python tests.Nosetests in test_main.py" />
+      <item itemvalue="Python.database" />
+      <item itemvalue="Python.main" />
+      <item itemvalue="Python.test_main" />
       <item itemvalue="Python tests.Nosetests for test_main.test_delete_many_db_item" />
+      <item itemvalue="Python tests.Nosetests in test_main.py" />
     </list>
     <recent_temporary>
       <list>
@@ -409,7 +397,7 @@
     </history-entry>
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="90830000" />
+    <option name="totallyTimeSpent" value="91292000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -422,9 +410,10 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-7" y="-7" width="1550" height="838" extended-state="6" />
+    <editor active="true" />
     <layout>
       <window_info id="Favorites" order="0" sideWeight="0.5021834" side_tool="true" weight="0.18255034" />
-      <window_info active="true" content_ui="combo" id="Project" order="1" sideWeight="0.4978166" visible="true" weight="0.19828156" />
+      <window_info active="true" content_ui="combo" id="Project" order="1" sideWeight="0.4978166" visible="true" weight="0.20643431" />
       <window_info id="Structure" order="2" sideWeight="0.5021834" side_tool="true" weight="0.18255034" />
       <window_info anchor="bottom" id="Database Changes" order="0" />
       <window_info anchor="bottom" id="Terminal" order="1" weight="0.329429" />
@@ -519,7 +508,7 @@
       <breakpoints>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/User.py</url>
-          <line>141</line>
+          <line>163</line>
           <option name="timeStamp" value="21" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
@@ -591,9 +580,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/backup/keys.db">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
+    <entry file="file://$PROJECT_DIR$/backup/keys.db" />
     <entry file="file://$PROJECT_DIR$/logger.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="63">
@@ -635,14 +622,14 @@
     <entry file="file://$PROJECT_DIR$/backup/username_2.json" />
     <entry file="file://$PROJECT_DIR$/errors.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="250">
-          <caret line="33" column="26" selection-start-line="33" selection-start-column="26" selection-end-line="33" selection-end-column="26" />
+        <state relative-caret-position="882">
+          <caret line="42" column="9" selection-start-line="42" selection-start-column="9" selection-end-line="42" selection-end-column="9" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/main.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="272">
+        <state relative-caret-position="336">
           <caret line="22" column="81" selection-start-line="22" selection-start-column="81" selection-end-line="22" selection-end-column="81" />
           <folding>
             <element signature="e#20#68#0" expanded="true" />
@@ -650,30 +637,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/networking.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1343">
-          <caret line="82" column="28" selection-start-line="82" selection-start-column="28" selection-end-line="82" selection-end-column="28" />
-          <folding>
-            <element signature="e#19#32#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/test_main.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2386">
-          <caret line="151" column="35" selection-start-line="151" selection-start-column="35" selection-end-line="151" selection-end-column="35" />
-          <folding>
-            <element signature="e#20#29#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/networking.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2410">
-          <caret line="238" column="37" lean-forward="true" selection-start-line="238" selection-start-column="37" selection-end-line="238" selection-end-column="37" />
+        <state relative-caret-position="189">
+          <caret line="21" column="34" selection-start-line="21" selection-start-column="34" selection-end-line="21" selection-end-column="34" />
           <folding>
             <element signature="e#19#32#0" expanded="true" />
           </folding>
@@ -682,8 +649,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/User.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1054">
-          <caret line="149" lean-forward="true" selection-start-line="149" selection-end-line="149" />
+        <state relative-caret-position="-2304">
+          <caret line="9" selection-start-line="9" selection-end-line="9" />
           <folding>
             <element signature="e#0#25#0" expanded="true" />
           </folding>
@@ -692,10 +659,30 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/database.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="867">
-          <caret line="138" selection-start-line="138" selection-end-line="138" />
+        <state relative-caret-position="1743">
+          <caret line="83" column="63" selection-start-line="83" selection-start-column="63" selection-end-line="83" selection-end-column="63" />
           <folding>
             <element signature="e#20#29#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/decoder.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-708">
+          <caret line="199" column="43" selection-start-line="199" selection-start-column="43" selection-end-line="199" selection-end-column="43" />
+          <folding>
+            <element signature="e#0#9#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/networking.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="294">
+          <caret line="14" column="27" lean-forward="true" selection-start-line="14" selection-start-column="27" selection-end-line="14" selection-end-column="27" />
+          <folding>
+            <element signature="e#19#32#0" expanded="true" />
           </folding>
         </state>
       </provider>

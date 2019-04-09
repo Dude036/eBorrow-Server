@@ -4,16 +4,30 @@ This project is an Inventory Catalog designed as a desktop application using Pyt
 
 ## Prerequisites
 
-To install all requirements for this project, run the following command
+We are using Python 3.6+ for this project, with pip 9.0.0+. To install all pip requirements for this project, run the following command
 ```
 pip install -r requirements.txt
 ```
+
+Windows Users: pip may ask for admin priviledges, which you can do as well. If you choose to not do that, you can use the argument "--user" to install all the libraries for just your user. This seems to work.
+
 
 ## Getting Started
 
 This repository contains the Server Application to be run headless. It is to be run completely autonomously. Backups and Running the application is up to the installer's discrestion.
 
-## Networking
+For setup, I assume you will have a basic knowledge of local IP Addresses, port forwarding/triggering, and basic Network savvy. For the server to have access to the outside network, you will have to modify a few things. In networking.py, you may specify a different port if you like, but the IP address that you should use is the Local IP address assosciated with the device running the program. This is most likely a device IP address in the range of 192.168.XXX.XXX. I found it by knowing which port the computer uses to connect to the outside network.
+
+To begin the application, run the following command.
+```
+python main.py
+```
+
+This will intiate the server. You can see the logs in out.log, which should give all the information as to what is happening in the server.
+
+To quit execution of the server, swap the '1' in config.json to a '0'. The server will terminate in no more than 30 seconds. To ensure that the server is terminated, out.log will specify that all tasks have been terminated.
+
+## Networking / Netcode
 
 See [Networking](Networking.md)
 
