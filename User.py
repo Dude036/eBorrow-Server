@@ -74,6 +74,24 @@ class User(object):
         for key, value in lib_item.items():
             self.Inventory.update({key: value})
 
+    # TODO: Add this to the User Class
+    def ownership_change(self, borrower, item_key, schedule):
+        """ ownership_change
+        item_key: str: Some Item key in the database of former owner
+        self: str: username of the former owner of the item
+        borrower: str: username of the new item recipient
+        """
+        new_exchange = {}
+        new_exchange['Permanent Owner'] = self.Username
+        new_exchange['Temporary Owner'] = borrower.Username
+        new_exchange['Item'] = item_key
+        new_exchange['Schedule'] = schedule
+
+        self.Exchange.append(new_exchange)
+        self.to_file()
+        borrower.Exchange.append(new_exchange)
+        borrower.to_file()
+
     def remove_from_inventory(self, lib_key):
         """
 
@@ -130,9 +148,13 @@ class User(object):
         :return: A string ready to be sent back to the user
         """
         header = '@' + self.Username + ':201'
-        # TODO: Build an Exchange translator
-        packet = str(self.Exchange)
+        #TODO: Build an Exchange translator
+        packet = '{'
+        for exchange in self.Exchange:
+            packet += json.dumps(self.Exchange[exchange]) + ',' + '}'
         return header + ' ' + packet
+
+
 
 
 if __name__ == '__main__':
