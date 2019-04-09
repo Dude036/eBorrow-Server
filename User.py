@@ -135,6 +135,13 @@ class User(object):
         packet = str(self.Messages)
         return header + ' ' + packet
 
+    def clear_messages(self):
+        """
+        A Function to clear all messages from a user's account
+        """
+        self.Messages = []
+        self.to_file()
+
     def send_exchanges(self):
         """
         Creating a packet to send User Exchanges back

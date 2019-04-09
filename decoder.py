@@ -33,8 +33,6 @@ def decoding(decode_buffer, transmit_buffer):
         logging.info("DECODER :: Extracting User Information")
 
         # Split the item into Header and Packet
-        header = None
-        packet = None
         match = re.match(r'([^ ]*) (.*)', item)
         if match is not None:
             header = match.group(1)
@@ -105,8 +103,8 @@ def interpretted(username, packet_id, packet, addr, transmit_buffer):
     :param username: Username of the subject
     :param packet_id: Packet identifier. Determines how the packet is handled
     :param packet: The actual packet dictionary
-    :param addr: the IP address to return to
-    :param transmit_buffer:
+    :param addr: the connection object to return to
+    :param transmit_buffer: This is the buffer to send information back to the user
     """
     if packet_id == 0:
         # New User Application
@@ -152,7 +150,6 @@ def interpretted(username, packet_id, packet, addr, transmit_buffer):
             if isinstance(packet['Key'], str):
                 if not user.remove_from_inventory(packet['Key']):
                     logging.error("DECODER :: Key not found in Library")
-                    logging.error("DECODER :: Sending Error to:", addr)
                     transmit_buffer.put([error_handler(8), addr])
                 else:
                     transmit_buffer.put([error_handler(0), addr])
@@ -236,16 +233,92 @@ def interpretted(username, packet_id, packet, addr, transmit_buffer):
             return
     elif packet_id == 6:
         # Update Item Ownership
-        # Currently under development
-        pass
+        # Returns an error Packet
+        # Extract Owner's User object and verify private Key
+        try:
+            owner_key = packet.pop('private')
+        except KeyError:
+            logging.error("DECODER :: Missing Private Key from Json object")
+            transmit_buffer.put([error_handler(7), addr])
+            return
+
+        if verify_key(username, owner_key, public=False):
+            owner = retrieve_user(username)
+            if owner is None:
+                logging.error("DECODER :: User not found in the database")
+                transmit_buffer.put([error_handler(17), addr])
+                return
+            # Extract Borrower's User object and verify public Key
+            try:
+                borrower_key = packet.pop('public')
+                borrower_username = packet.pop('New Owner')
+            except KeyError:
+                logging.error("DECODER :: Missing public Key or New Owner from Json object")
+                transmit_buffer.put([error_handler(7), addr])
+                return
+            if verify_key(borrower_username, borrower_key, public=True):
+                borrower = retrieve_user(username)
+                if borrower is None:
+                    logging.error("DECODER :: User not found in the database")
+                    transmit_buffer.put([error_handler(17), addr])
+                    return
+                # Get the Hash and Schedule
+                try:
+                    schedule = packet.pop('Schedule')
+                    item_key = packet.pop('Key')
+                except KeyError:
+                    logging.error("DECODER :: Missing Schedule or key from Json object")
+                    transmit_buffer.put([error_handler(7), addr])
+                    return
+                ret_code = owner.ownership_change(borrower, item_key, schedule)
+                transmit_buffer.put([error_handler(ret_code), addr])
+            else:
+                logging.error("DECODER :: Incorrect Friend public Key")
+                transmit_buffer.put([error_handler(3), addr])
+                return
+        else:
+            logging.error("DECODER :: Incorrect User private Key")
+            transmit_buffer.put([error_handler(3), addr])
+            return
     elif packet_id == 7:
         # Send Messages to the User
-        # Currently under development
-        pass
+        # Requires a clap back
+        try:
+            user_key = packet.pop("private")
+        except KeyError:
+            logging.error("DECODER :: Missing private key from Json object")
+            transmit_buffer.put([error_handler(7), addr])
+            return
+        if verify_key(username, user_key, public=False):
+            user = retrieve_user(username)
+            transmit_buffer.put([user.send_messages(), addr])
+        else:
+            logging.error("DECODER :: Incorrect User private Key")
+            transmit_buffer.put([error_handler(3), addr])
+            return
     elif packet_id == 8:
         # Send Exchanges to the User
         # Currently under development
         pass
+    elif packet_id == 9:
+        # Delete all the User's messages
+        # Returns and Error Packet
+        try:
+            user_key = packet.pop("private")
+        except KeyError:
+            logging.error("DECODER :: Missing private key from Json object")
+            transmit_buffer.put([error_handler(7), addr])
+            return
+        if verify_key(username, user_key, public=False):
+            logging.info("DECODER :: Deleted " + username + "'s messages per request")
+            user = retrieve_user(username)
+            user.clear_messages()
+            transmit_buffer.put([error_handler(0), addr])
+        else:
+            logging.error("DECODER :: Incorrect User private Key")
+            transmit_buffer.put([error_handler(3), addr])
+            return
+
     logging.debug("DECODER :: Successfully decoded id: " + str(packet_id))
 
 
@@ -255,8 +328,8 @@ def piped(username, packet_id, packet, addr, transmit_buffer):
     :param username: Username of the subject
     :param packet_id: Packet identifier. Determines how the packet is handled
     :param packet: The actual packet dictionary
-    :param addr: the IP address to return to
-    :param transmit_buffer:
+    :param addr: the connection object to return to
+    :param transmit_buffer: This is the buffer to send information back to the user
     """
     if packet_id == 100:
         # Acquisition Request
