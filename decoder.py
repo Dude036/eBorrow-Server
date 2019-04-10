@@ -1,5 +1,5 @@
 import re
-# from database import add_user, delete_user, ownership_change, retrieve_user
+from database import add_user, delete_user, retrieve_user
 import simplejson as json
 from errors import error_handler
 import hashlib
@@ -188,7 +188,7 @@ def interpretted(username, packet_id, packet, addr, transmit_buffer):
             transmit_buffer.put([error_handler(3), addr])
 
     elif packet_id == 4:
-        # Send all the Users' Data to the user
+        # Send all the Users' Inventory to the user
         # Instead of a Zero code, it'll return the asked for information.
         if verify_key(username, packet['public'], public=True):
             if packet['Library'] == 1:
