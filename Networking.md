@@ -77,7 +77,7 @@ These are interpreted commands that edits the database in some manner or form. T
 		Header:
 			@username:6
 		Packet:
-            {
+			{
                 "Key": "SHA_256 Hash of item", 
                 "New Owner": "friend_username",
                 "public": "Friends_Public_key",
@@ -218,7 +218,7 @@ This is how items are saved in the database, and if you want to write your own j
 
     {
         "SHA-256 Hash of Permanent Fields": {
-		"Category": "This can be of any spcificed Category",
+		"Category": "This can be of any specificed Category",
 		"Subcategory": "A subtype for further sorting",
 		"Permantent Owner": "User name of the owner",
 		"Name": "The name of the item",
@@ -228,7 +228,7 @@ This is how items are saved in the database, and if you want to write your own j
 			"Id": "An identifier specified by the subcategory. For instance, an ISBN for a book, or a UPC for a Board game"
 			"This dictionary varies between the subcatagory and a category"
 		}
-	    }
+	  	"History": [List of all exchanges]
     }
 
 
@@ -273,6 +273,21 @@ The Type Info varies based on the category and the sub category. So far, we've i
         "Id": "The ISBN code to auto fill the above fields"
     }
 
+### Exchange Item Stucture
+
+Every Exchange object is more or less just a selective shallow copy of the item itself. In order to create an Exchange object, you'll need to have a friend with items that you want to borrow. The object carries has the following structure
+
+	"SHA265 Key": {
+		"Category": "This can be of any specificed Category",
+		"Subcategory": "A subtype for further sorting",
+		"Permantent Owner": "User name of the owner",
+		"Name": "The name of the item",
+		"Current Owner": "Your Username",
+		"Schedule": {
+			"In": (Day, Month, Year),
+			"Out": (Day, Month, Year)
+		}
+	}
 
 ## Server Return Codes:
 
