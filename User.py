@@ -8,13 +8,15 @@ class User(object):
     This is the class to state what a user has attached to them.
     This includes Inventory, Messages, and Exchange information	"""
 
-    def __init__(self, name, inventory=None, messages=None, exchange=None, json_data=None):
+    def __init__(self, name, inventory=None, messages=None, exchange=None, pending_exchanges=None, pending_friends=None, json_data=None):
         """
         Basic Constructor
         :param name: a string for the username of the user
         :param inventory: a dictionary containing the user's inventory
-        :param messages: a list of message objects that the user needs to read
+        :param messages: a list of plain text messages that the user needs to read
         :param exchange: a list of basic item information for lent and borrowed objects
+        :param pending_exchanges: A Dictionary of exchange requests
+        :param pending_friends: a list of friends requests. Formatted as Packets
         :param json_data: a json object to be interpreted into a class object
         """
         self.Username = name
@@ -22,6 +24,8 @@ class User(object):
             self.Inventory = inventory
             self.Messages = messages
             self.Exchange = exchange
+            self.Pending_Exchanges = pending_exchanges
+            self.Pending_Friends = pending_friends
         else:
             self.__read(json_data)
         if self.Inventory is None:
@@ -30,6 +34,10 @@ class User(object):
             self.Messages = []
         if self.Exchange is None:
             self.Exchange = []
+        if self.Pending_Exchanges is None:
+            self.Pending_Exchanges = {}
+        if self.Pending_Friends is None:
+            self.Pending_Friends = []
 
     def __read(self, json_data):
         """
@@ -76,18 +84,14 @@ class User(object):
         for key, value in lib_item.items():
             self.Inventory.update({key: value})
 
-    # TODO: Add this to the User Class
     def ownership_change(self, borrower, item_key, schedule):
         """ ownership_change
         item_key: str: Some Item key in the database of former owner
         self: str: username of the former owner of the item
         borrower: str: username of the new item recipient
         """
-        new_exchange = {}
-        new_exchange['Permanent Owner'] = self.Username
-        new_exchange['Temporary Owner'] = borrower.Username
-        new_exchange['Item'] = item_key
-        new_exchange['Schedule'] = schedule
+        new_exchange = {'Permanent Owner': self.Username, 'Temporary Owner': borrower.Username, 'Item': item_key,
+                        'Schedule': schedule}
 
         self.Exchange.append(new_exchange)
         self.to_file()
@@ -96,7 +100,7 @@ class User(object):
 
     def remove_from_inventory(self, lib_key):
         """
-
+        Remove an item from the database if it exists
         :param lib_key: an SHA 256 key to remove from the database
         """
         result = True
@@ -135,7 +139,7 @@ class User(object):
         :return: A string ready to be sent back to the user
         """
         header = '@' + self.Username + ':201'
-        packet = str(self.Messages)
+        packet = json.dumps(self.Messages)
         return header + ' ' + packet
 
     def clear_messages(self):
@@ -151,16 +155,12 @@ class User(object):
         :return: A string ready to be sent back to the user
         """
         header = '@' + self.Username + ':201'
-        # TODO: Build an Exchange translator
-        packet = '{'
-        for exchange in self.Exchange:
-            packet += json.dumps(self.Exchange[exchange]) + ',' + '}'
+        packet = json.dumps(self.Exchange)
         return header + ' ' + packet
 
 
 if __name__ == '__main__':
-    person_a = User('person_a', inventory={
-                    'key1': 1}, messages=['test'], exchange={})
+    person_a = User('person_a', inventory={}, messages=[], exchange={}, pending_exchanges={}, pending_friends=[])
     print(person_a.serialize())
     person_b = User('person_b', json_data=person_a.serialize())
     print(person_b.serialize())

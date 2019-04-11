@@ -115,13 +115,13 @@ These are interpreted commands that edits the database in some manner or form. T
 		Packet:
 			{"Messages": -1, "private":Private_key}
 
-**NOTE**: This will delete all messages from the user's account, and there is no verification on the server's end to verify that they want to do that. Once it's sent, it's done
+**NOTE**: This will delete all messages from the user's account, and there is no verification on the server's end to verify that they want to do that. Once it's sent, it's done.
 
 #### Piped Commands
 
 These commands are only read by the server, and are stored in a buffer. Whenever the target user connects with the database, the command is then sent. All piped commands have a packet identifier between 100 and 199.
 
-* Aquisition (Exchange) Request
+* Exchange Request
 	
 		Header:
 			@username:100
@@ -136,9 +136,9 @@ These commands are only read by the server, and are stored in a buffer. Whenever
 			        "Public": "Public_key",
 			        "Username": "friends_username",
 			    }
-			 }
+			}
 
-* Friend Request
+* Friend Invite
 
 		Header:
 			@your_username:101
@@ -146,7 +146,7 @@ These commands are only read by the server, and are stored in a buffer. Whenever
 			{"Target": "friends_username"}
 			
 			
-* Add Friend
+* Add Friend / Friend Confirmation
 
         Header:
             @your_username:102
@@ -192,6 +192,25 @@ These are commands that are sent, per request from a user, to the connected IP a
 			@username:202
 		Packet:
 			[{Exchange Object}, {Exchange Object}, ... ]
+
+
+* Return Pending Exchanges
+
+		Header:
+			@username:203
+		Packet:
+			[{Exchange Object}, {Exchange Object}, ... ]
+
+
+
+* Return Pending Friends
+
+		Header:
+			@username:204
+		Packet:
+			["103 Packet", "101 Packet", ... ]
+
+
 
 ### Database Item Stucture
 
