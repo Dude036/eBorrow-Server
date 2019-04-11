@@ -77,7 +77,7 @@ These are interpreted commands that edits the database in some manner or form. T
 		Header:
 			@username:6
 		Packet:
-            {
+			{
                 "Key": "SHA_256 Hash of item", 
                 "New Owner": "friend_username",
                 "public": "Friends_Public_key",
@@ -115,13 +115,13 @@ These are interpreted commands that edits the database in some manner or form. T
 		Packet:
 			{"Messages": -1, "private":Private_key}
 
-**NOTE**: This will delete all messages from the user's account, and there is no verification on the server's end to verify that they want to do that. Once it's sent, it's done
+**NOTE**: This will delete all messages from the user's account, and there is no verification on the server's end to verify that they want to do that. Once it's sent, it's done.
 
 #### Piped Commands
 
 These commands are only read by the server, and are stored in a buffer. Whenever the target user connects with the database, the command is then sent. All piped commands have a packet identifier between 100 and 199.
 
-* Aquisition (Exchange) Request
+* Exchange Request
 	
 		Header:
 			@username:100
@@ -136,9 +136,9 @@ These commands are only read by the server, and are stored in a buffer. Whenever
 			        "Public": "Public_key",
 			        "Username": "friends_username",
 			    }
-			 }
+			}
 
-* Friend Request
+* Friend Invite
 
 		Header:
 			@your_username:101
@@ -146,7 +146,7 @@ These commands are only read by the server, and are stored in a buffer. Whenever
 			{"Target": "friends_username"}
 			
 			
-* Add Friend
+* Add Friend / Friend Confirmation
 
         Header:
             @your_username:102
@@ -193,13 +193,32 @@ These are commands that are sent, per request from a user, to the connected IP a
 		Packet:
 			[{Exchange Object}, {Exchange Object}, ... ]
 
+
+* Return Pending Exchanges
+
+		Header:
+			@username:203
+		Packet:
+			[{Exchange Object}, {Exchange Object}, ... ]
+
+
+
+* Return Pending Friends
+
+		Header:
+			@username:204
+		Packet:
+			["103 Packet", "101 Packet", ... ]
+
+
+
 ### Database Item Stucture
 
 This is how items are saved in the database, and if you want to write your own json object item, this is how you do it. The SHA-256 key is validated from the Category, Subcategory, the Permanent Owner and the Name of the item. *These items cannot be changed. The hash is determined from this, and will result in a null reference if you do.*
 
     {
         "SHA-256 Hash of Permanent Fields": {
-		"Category": "This can be of any spcificed Category",
+		"Category": "This can be of any specificed Category",
 		"Subcategory": "A subtype for further sorting",
 		"Permantent Owner": "User name of the owner",
 		"Name": "The name of the item",
@@ -209,7 +228,7 @@ This is how items are saved in the database, and if you want to write your own j
 			"Id": "An identifier specified by the subcategory. For instance, an ISBN for a book, or a UPC for a Board game"
 			"This dictionary varies between the subcatagory and a category"
 		}
-	    }
+	  	"History": [List of all exchanges]
     }
 
 
@@ -254,6 +273,21 @@ The Type Info varies based on the category and the sub category. So far, we've i
         "Id": "The ISBN code to auto fill the above fields"
     }
 
+### Exchange Item Stucture
+
+Every Exchange object is more or less just a selective shallow copy of the item itself. In order to create an Exchange object, you'll need to have a friend with items that you want to borrow. The object carries has the following structure
+
+	"SHA265 Key": {
+		"Category": "This can be of any specificed Category",
+		"Subcategory": "A subtype for further sorting",
+		"Permantent Owner": "User name of the owner",
+		"Name": "The name of the item",
+		"Current Owner": "Borrower's Username",
+		"Schedule": {
+			"In": (Day, Month, Year),
+			"Out": (Day, Month, Year)
+		}
+	}
 
 ## Server Return Codes:
 

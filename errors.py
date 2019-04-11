@@ -25,6 +25,7 @@ ERROR_CODES = {
     18: 'Unterminated Transmission Buffer Received',
     19: 'Invalid JSON',
     20: 'Invalid Data type received',
+    21: 'Invalid Exchange Schedule Format',
     99: 'Unknown Error Occurred. Unable to resolve error'
 }
 
