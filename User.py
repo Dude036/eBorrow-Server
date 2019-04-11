@@ -1,7 +1,7 @@
 import simplejson as json
 import os
 import logging
-
+import re
 
 class User(object):
     """User class
@@ -158,14 +158,16 @@ class User(object):
         packet = json.dumps(self.Exchange)
         return header + ' ' + packet
 
-    def add_pending_friend(self, username):
-        pass
+    def add_pending_friend(self, packet):
+        self.Pending_Friends.append(packet)
+        self.to_file()
 
     def remove_pending_friend(self, username):
-        pass
-
-    def make_pending_exchange(self, exchange_request):
-        pass
+        for i in range(len(self.Pending_Friends)):
+            m = re.match(re.compile('"' + username + '"'), self.Pending_Friends[i])
+            if m is not None:
+                self.Pending_Friends.pop(i)
+        self.to_file()
 
     def complete_exchange(self, user, key):
         """
