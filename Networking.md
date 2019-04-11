@@ -282,7 +282,7 @@ Every Exchange object is more or less just a selective shallow copy of the item 
 		"Subcategory": "A subtype for further sorting",
 		"Permantent Owner": "User name of the owner",
 		"Name": "The name of the item",
-		"Current Owner": "Your Username",
+		"Current Owner": "Borrower's Username",
 		"Schedule": {
 			"In": (Day, Month, Year),
 			"Out": (Day, Month, Year)

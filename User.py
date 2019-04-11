@@ -158,6 +158,39 @@ class User(object):
         packet = json.dumps(self.Exchange)
         return header + ' ' + packet
 
+    def add_pending_friend(self, username):
+        pass
+
+    def remove_pending_friend(self, username):
+        pass
+
+    def make_pending_exchange(self, exchange_request):
+        pass
+
+    def complete_exchange(self, user, key):
+        """
+        Complete an Exchange between two friends
+        :param user: A User Object of the other user
+        :param key: The SHA265 key for the dictionary
+        :return: Boolean: If the operation occurred successfully
+        """
+        if key not in self.Pending_Exchanges.keys():
+            logging.error("USER    :: Exchange Key not found in pending Exchanges")
+            return False
+        if key not in self.Inventory.keys():
+            logging.error("USER    :: Exchange Key not found Inventory")
+            return False
+        value = self.Pending_Exchanges.pop(key)
+        # value['Status'] = 'Open'
+        self.Inventory[key]['Current Owner'] = user.Username
+        self.Inventory[key]['Available'] = False
+        self.Inventory[key]["History"].append(value)
+        self.Exchange[key] = value
+        self.to_file()
+        user.Exchange[key] = value
+        user.to_file()
+        return True
+
 
 if __name__ == '__main__':
     person_a = User('person_a', inventory={}, messages=[], exchange={}, pending_exchanges={}, pending_friends=[])
@@ -165,3 +198,5 @@ if __name__ == '__main__':
     person_b = User('person_b', json_data=person_a.serialize())
     print(person_b.serialize())
     person_a.to_file()
+
+
