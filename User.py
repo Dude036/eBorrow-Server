@@ -158,11 +158,37 @@ class User(object):
         packet = json.dumps(self.Exchange)
         return header + ' ' + packet
 
+    def send_pending_exchanges(self):
+        """
+        Create a 
+        :return: A string ready to be sent back to the user
+        """
+        header = '@' + self.Username + ':203'
+        packet = json.dumps(self.Pending_Exchanges)
+        return header + ' ' + packet
+
+    def send_pending_friends(self):
+        """
+        Create a Packet for sending pending friend requests
+        :return: A string ready to be sent back to the user
+        """
+        header = '@' + self.Username + ':204'
+        packet = json.dumps(self.Pending_Friends)
+        return header + ' ' + packet
+
     def add_pending_friend(self, packet):
+        """
+        Add a pending friend request
+        :param packet: A full friend Packet
+        """
         self.Pending_Friends.append(packet)
         self.to_file()
 
     def remove_pending_friend(self, username):
+        """
+        Remove a friend from pending for Deletion of friend or accepting a friend
+        :param username: The Username of the friend we're removing from pending
+        """
         for i in range(len(self.Pending_Friends)):
             m = re.match(re.compile('"' + username + '"'), self.Pending_Friends[i])
             if m is not None:
