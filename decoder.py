@@ -303,7 +303,19 @@ def interpretted(username, packet_id, packet, addr, transmit_buffer):
     elif packet_id == 8:
         # Send Exchanges to the User
         # Currently under development
-        pass
+        try:
+            user_key = packet.pop("private")
+        except KeyError:
+            logging.error("DECODER :: Missing Private Key in Packet")
+            transmit_buffer.put([error_handler(7), addr])
+            return
+        if verify_key(username, user_key, public=False):
+            user = retrieve_user(username)
+            transmit_buffer.put([user.send_exchanges(), addr])
+        else:
+            logging.error("DECODER :: Incorrect User Private Key")
+            transmit_buffer.put([error_handler(3), addr])
+            return
     elif packet_id == 9:
         # Delete all the User's messages
         # Returns and Error Packet
