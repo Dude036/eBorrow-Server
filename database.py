@@ -25,7 +25,7 @@ def retrieve_user(username):
             file = os.path.join('db', username + '.json')
             database = User(username, json_data=json.load(open(file, 'r')))
     except IOError as e:
-        logging.error("Database unable to read '" + username + "'.")
+        logging.error("DATABASE:: Database unable to read '" + username + "'.")
     finally:
         return database
 
@@ -53,12 +53,12 @@ def auto_backup():
         try:
             os.mkdir(os.getcwd() + '/backup')
         except OSError:
-            logging.error("Backup directory creation failed")
+            logging.error("DATABASE:: Backup directory creation failed")
     if 'db' not in os.listdir(os.getcwd()):
         try:
             os.mkdir(os.getcwd() + '/db')
         except OSError:
-            logging.error("Backup directory creation failed")
+            logging.error("DATABASE:: Backup directory creation failed")
 
     while True:
         if datetime.utcnow().minute % backup_interval == 0:
@@ -75,12 +75,12 @@ def backup_libraries():
         try:
             os.mkdir(os.getcwd() + '/backup')
         except OSError:
-            logging.error("Backup directory creation failed")
+            logging.error("DATABASE:: Backup directory creation failed")
 
     # For Every File in the database directory ending with json
     for file in os.listdir("db"):
         if file.endswith(".json"):
-            logging.info("Backing up: %s" % file)
+            logging.info("DATABASE:: Backing up: %s" % file)
             # Dump the file in the backup folder as a json file
             class_output = retrieve_user(file)
             if class_output is not None:
@@ -98,8 +98,8 @@ def add_user(name, private_key, public_key):
     """
     # Validate if the Username Exists
     if find_user(name):
-        logging.error("User already in database")
-        logging.info("Send error to the user")
+        logging.error("DATABASE:: User already in database")
+        logging.info("DATABASE:: Send error to the user")
         return False
     else:
         # Create and store Empty User Item
@@ -134,7 +134,7 @@ def delete_user(name):
         json.dump(user_keys, open('keys.db', 'w'), indent=2)
         return True
     else:
-        logging.info("The file does not exist")
+        logging.info("DATABASE:: The file does not exist")
         return False
 
 
