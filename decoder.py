@@ -376,8 +376,39 @@ def piped(username, packet_id, packet, addr, transmit_buffer):
     """
     if packet_id == 100:
         # Acquisition Request
-        # Still Developing process
-        pass
+        # Returns an Error Packet
+        try:
+            lender_key = packet["Lender"]["Public"]
+            borrow_key = packet["Borrower"]["Public"]
+        except KeyError:
+            logging.error("DECODER :: Missing private key from Json object")
+            transmit_buffer.put([error_handler(11), addr])
+            return
+        try:
+            lender_name = packet["Lender"]["Username"]
+            borrow_name = packet["Borrower"]["Username"]
+        except KeyError:
+            logging.error("DECODER :: Missing private key from Json object")
+            transmit_buffer.put([error_handler(17), addr])
+            return
+        if verify_key(lender_name, lender_key, public=True):
+            if verify_key(borrow_name, borrow_key, public=True):
+                user = retrieve_user(username)
+                try:
+                    key = packet.pop('Key')
+                except KeyError:
+                    logging.error("DECODER :: Missing 'Key' Hash from request")
+                    transmit_buffer.put([error_handler(7), addr])
+                    return
+                user.add_pending_exchange(key, packet)
+            else:
+                logging.error("DECODER :: Username: '" + borrow_name + "' has incorrect public Key")
+                transmit_buffer.put([error_handler(4), addr])
+                return
+        else:
+            logging.error("DECODER :: Username: '" + lender_name + "' has incorrect public Key")
+            transmit_buffer.put([error_handler(4), addr])
+            return
 
     elif packet_id == 101:
         # Friend Request
@@ -390,3 +421,5 @@ def piped(username, packet_id, packet, addr, transmit_buffer):
     elif packet_id == 103:
         # Delete Request
         pass
+
+    logging.debug("DECODER :: Successfully decoded id: " + str(packet_id))

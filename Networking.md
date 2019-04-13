@@ -147,7 +147,7 @@ These commands are only read by the server, and are stored in a buffer. Whenever
 			@username:100
 		Packet:
 			{
-			    "SHA_256 Hash of item": 1,
+			    "Key": "SHA_256 Hash of item",
 			    "Borrower": {
 			        "Public": "Public_key",
 			        "Username": "your_username",
@@ -379,7 +379,7 @@ The Error Packet 0 is special. This happens when a command is correctly processe
 
 12. Missing Public Key
 
-	Lacking a Private Key
+	Lacking a Public Key
 
 13. Illegal Character
 
