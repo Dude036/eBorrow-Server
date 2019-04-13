@@ -97,7 +97,7 @@ These are interpreted commands that edits the database in some manner or form. T
 		Packet:
 			{"Messages": 1, "private":Private_key}
 
-*Response:* This command sends back packet ID 200 which means that your command was properly executed. If there was an error while processing, an error packet will be generated.
+*Response:* This command sends back packet ID 201 which means that your command was properly executed. If there was an error while processing, an error packet will be generated.
 
 * Send Exchanges
 
@@ -106,7 +106,7 @@ These are interpreted commands that edits the database in some manner or form. T
 		Packet:
 			{"Exchanges": 1, "private":Private_key}
 
-*Response:* This command sends back packet ID 200 which means that your command was properly executed. If there was an error while processing, an error packet will be generated.
+*Response:* This command sends back packet ID 202 which means that your command was properly executed. If there was an error while processing, an error packet will be generated.
 
 * Clear All Messages
 
@@ -116,6 +116,26 @@ These are interpreted commands that edits the database in some manner or form. T
 			{"Messages": -1, "private":Private_key}
 
 **NOTE**: This will delete all messages from the user's account, and there is no verification on the server's end to verify that they want to do that. Once it's sent, it's done.
+
+* Send Pending Friend Requests
+
+		Header:
+			@your_username:10
+		Packet:
+			{"Friends": 1, "private":Private_key}
+
+*Response:* This command sends back packet ID 204 which means that your command was properly executed. If there was an error while processing, an error packet will be generated.
+
+
+* Send Pending Exchange Requests
+
+		Header:
+			@your_username:10
+		Packet:
+			{"Exchanges": 1, "private":Private_key}
+
+*Response:* This command sends back packet ID 203 which means that your command was properly executed. If there was an error while processing, an error packet will be generated.
+
 
 #### Piped Commands
 
@@ -283,6 +303,7 @@ Every Exchange object is more or less just a selective shallow copy of the item 
 		"Permantent Owner": "User name of the owner",
 		"Name": "The name of the item",
 		"Current Owner": "Borrower's Username",
+		"Status": "Closed || Open || Pending"
 		"Schedule": {
 			"In": (Day, Month, Year),
 			"Out": (Day, Month, Year)
