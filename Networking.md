@@ -172,9 +172,12 @@ These commands are only read by the server, and are stored in a buffer. Whenever
             @your_username:102
         Packet:
             {
-                "Target": "friends_username"
+                "Target": "friends_username",
+                "Step": #
                 "Key": Your_Public_key
             }
+
+**NOTE:** The step denotes how many times this command has been issued by the two users, i.e the first transmittal, step equals 1. The second transmittal, step equals 2. 
 
 * Delete Friend
     
