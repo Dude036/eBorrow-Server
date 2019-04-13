@@ -24,7 +24,8 @@ if __name__ == '__main__':
             [decode_buffer, transmit_buffer])),
         Process(target=decoding, args=tuple((decode_buffer, transmit_buffer))),
         Process(target=network_transmit, args=[transmit_buffer]),
-        Process(target=auto_backup)]
+        Process(target=auto_backup)
+    ]
     # Run the tasks
     for r in runnables:
         logging.info("Beginning: %s" % str(r))
