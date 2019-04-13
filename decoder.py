@@ -338,7 +338,25 @@ def interpretted(username, packet_id, packet, addr, transmit_buffer):
             logging.info("DECODER :: ")
             user = retrieve_user(username)
             new_header = '@' + username + ':204'
-            transmit_buffer.put([new_header + ' ' + user.Pending_Friends, addr])
+            transmit_buffer.put([new_header + ' ' + user.send_pending_friends(), addr])
+        else:
+            logging.error("DECODER :: Incorrect User private Key")
+            transmit_buffer.put([error_handler(3), addr])
+            return
+    elif packet_id == 11:
+        # Send all pending friend requests
+        # Returns packet 204 or an Error Packet
+        try:
+            user_key = packet.pop("private")
+        except KeyError:
+            logging.error("DECODER :: Missing private key from Json object")
+            transmit_buffer.put([error_handler(7), addr])
+            return
+        if verify_key(username, user_key, public=False):
+            logging.info("DECODER :: ")
+            user = retrieve_user(username)
+            new_header = '@' + username + ':203'
+            transmit_buffer.put([new_header + ' ' + user.send_pending_exchanges(), addr])
         else:
             logging.error("DECODER :: Incorrect User private Key")
             transmit_buffer.put([error_handler(3), addr])
