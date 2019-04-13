@@ -3,6 +3,7 @@ import os
 import logging
 import re
 
+
 class User(object):
     """User class
     This is the class to state what a user has attached to them.
@@ -54,6 +55,8 @@ class User(object):
             self.Inventory = json_data['Inventory']
             self.Messages = json_data['Messages']
             self.Exchange = json_data['Exchange']
+            self.Pending_Exchanges = json_data['Pending_Exchanges']
+            self.Pending_Friends = json_data['Pending_Friends']
 
     def serialize(self):
         """
@@ -160,7 +163,7 @@ class User(object):
 
     def send_pending_exchanges(self):
         """
-        Create a 
+        Create a Packet for pending exchanges
         :return: A string ready to be sent back to the user
         """
         header = '@' + self.Username + ':203'
