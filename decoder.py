@@ -111,8 +111,10 @@ def interpretted(username, packet_id, packet, addr, transmit_buffer):
         # Not necessary to return anything for this function
         secret_key = packet['private']
         public_key = packet['public']
-        add_user(username, secret_key, public_key)
-        transmit_buffer.put([error_handler(0), addr])
+        if add_user(username, secret_key, public_key):
+            transmit_buffer.put([error_handler(0), addr])
+        else:
+            transmit_buffer.put([error_handler(16), addr])
 
     elif packet_id == 1:
         # Delete User from Database
