@@ -130,7 +130,7 @@ These are interpreted commands that edits the database in some manner or form. T
 * Send Pending Exchange Requests
 
 		Header:
-			@your_username:10
+			@your_username:11
 		Packet:
 			{"Exchanges": 1, "private":Private_key}
 
