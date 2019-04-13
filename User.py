@@ -187,6 +187,14 @@ class User(object):
         self.Pending_Friends.append(packet)
         self.to_file()
 
+    def add_pending_exchange(self, sha_key, packet):
+        """
+        Add a pending exchange request to the
+        :param packet: A full friend Packet
+        """
+        self.Pending_Exchanges[sha_key] = packet
+        self.to_file()
+
     def remove_pending_friend(self, username):
         """
         Remove a friend from pending for Deletion of friend or accepting a friend
