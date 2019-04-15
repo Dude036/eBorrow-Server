@@ -3,6 +3,7 @@ import os
 import logging
 import re
 
+
 class User(object):
     """User class
     This is the class to state what a user has attached to them.
@@ -54,6 +55,8 @@ class User(object):
             self.Inventory = json_data['Inventory']
             self.Messages = json_data['Messages']
             self.Exchange = json_data['Exchange']
+            self.Pending_Exchanges = json_data['Pending_Exchanges']
+            self.Pending_Friends = json_data['Pending_Friends']
 
     def serialize(self):
         """
@@ -90,6 +93,7 @@ class User(object):
         self: str: username of the former owner of the item
         borrower: str: username of the new item recipient
         """
+        # TODO: Add an if statement that if the item is being returned to the User's database. don't add the exchange objects
         new_exchange = {'Permanent Owner': self.Username, 'Temporary Owner': borrower.Username, 'Item': item_key,
                         'Schedule': schedule}
 
@@ -160,7 +164,7 @@ class User(object):
 
     def send_pending_exchanges(self):
         """
-        Create a 
+        Create a Packet for pending exchanges
         :return: A string ready to be sent back to the user
         """
         header = '@' + self.Username + ':203'
@@ -182,6 +186,14 @@ class User(object):
         :param packet: A full friend Packet
         """
         self.Pending_Friends.append(packet)
+        self.to_file()
+
+    def add_pending_exchange(self, sha_key, packet):
+        """
+        Add a pending exchange request to the
+        :param packet: A full friend Packet
+        """
+        self.Pending_Exchanges[sha_key] = packet
         self.to_file()
 
     def remove_pending_friend(self, username):
