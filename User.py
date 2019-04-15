@@ -93,6 +93,7 @@ class User(object):
         self: str: username of the former owner of the item
         borrower: str: username of the new item recipient
         """
+        # TODO: Add an if statement that if the item is being returned to the User's database. don't add the exchange objects
         new_exchange = {'Permanent Owner': self.Username, 'Temporary Owner': borrower.Username, 'Item': item_key,
                         'Schedule': schedule}
 
