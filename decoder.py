@@ -349,9 +349,7 @@ def piped(username, packet_id, packet, addr, transmit_buffer):
     :param transmit_buffer: This is the buffer to send information back to the user
     """
     if packet_id == 100:
-        # Acquisition Request
-        # Still Developing process
-        pass
+        #initial request for an item exchange
 
     elif packet_id == 101:
         # Friend Request
