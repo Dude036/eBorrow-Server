@@ -424,7 +424,13 @@ def piped(username, packet_id, packet, addr, transmit_buffer):
 
     elif packet_id == 101:
         # Friend Request
-        pass
+        try:
+            sender_name = retrieve_user(username)
+            receiver_name = retrieve_user(packet["Target"])
+        except KeyError:
+            logging.error("DECODER :: Invalid Username for Friend Request")
+            transmit_buffer.put([error_handler(17), addr])
+            return
 
     elif packet_id == 102:
         # Add Friend
