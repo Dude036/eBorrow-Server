@@ -424,6 +424,7 @@ def piped(username, packet_id, packet, addr, transmit_buffer):
 
     elif packet_id == 101:
         # Friend Request
+        # Pending Josh-Approval
         try:
             sender_name = retrieve_user(username)
             receiver_name = retrieve_user(packet["Target"])
@@ -431,6 +432,10 @@ def piped(username, packet_id, packet, addr, transmit_buffer):
             logging.error("DECODER :: Invalid Username for Friend Request")
             transmit_buffer.put([error_handler(17), addr])
             return
+        receiver_name.add_pending_friend(packet)
+        sender_name.add_pending_friend(packet)
+        # send back the 0 error for 'all okay'
+        transmit_buffer.put([error_handler(0), addr])
 
     elif packet_id == 102:
         # Add Friend
