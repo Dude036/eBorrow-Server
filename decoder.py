@@ -439,7 +439,14 @@ def piped(username, packet_id, packet, addr, transmit_buffer):
 
     elif packet_id == 102:
         # Add Friend
-        pass
+        # Sent after confirmation is given
+        try:
+            sender_name = retrieve_user(username)
+            receiver_name = retrieve_user(packet["Target"])
+        except KeyError:
+            logging.error("DECODER :: Invalid Username in Add Friend/Confirmation")
+            transmit_buffer.put([error_handler(17), addr])
+            return
 
     elif packet_id == 103:
         # Delete Request
