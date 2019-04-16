@@ -413,6 +413,8 @@ def piped(username, packet_id, packet, addr, transmit_buffer):
                     transmit_buffer.put([error_handler(7), addr])
                     return
                 user.add_pending_exchange(key, packet)
+                lender_name.add_pending_exchange(key, packet)
+                transmit_buffer.put([error_handler(0), addr])
             else:
                 logging.error("DECODER :: Username: '" + borrow_name + "' has incorrect public Key")
                 transmit_buffer.put([error_handler(4), addr])
