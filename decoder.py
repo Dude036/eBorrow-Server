@@ -450,7 +450,9 @@ def piped(username, packet_id, packet, addr, transmit_buffer):
         sender_key = packet["Key"]
         if verify_key(sender_name, sender_key, public=True)
             transmit_buffer.put(packet)
-        
+        else:
+            logging.error("DECODER :: Username: '" + sender_name + "' has incorrect public Key")
+            transmit_buffer.put([error_handler(4), addr])
 
     elif packet_id == 103:
         # Delete Request
