@@ -424,11 +424,35 @@ def piped(username, packet_id, packet, addr, transmit_buffer):
 
     elif packet_id == 101:
         # Friend Request
-        pass
+        # Pending Josh-Approval
+        try:
+            sender_name = retrieve_user(username)
+            receiver_name = retrieve_user(packet["Target"])
+        except KeyError:
+            logging.error("DECODER :: Invalid Username for Friend Request")
+            transmit_buffer.put([error_handler(17), addr])
+            return
+        receiver_name.add_pending_friend(packet)
+        sender_name.add_pending_friend(packet)
+        # send back the 0 error for 'all okay'
+        transmit_buffer.put([error_handler(0), addr])
 
     elif packet_id == 102:
         # Add Friend
-        pass
+        # Sent after confirmation is given
+        try:
+            sender_name = retrieve_user(username)
+            receiver_name = retrieve_user(packet["Target"])
+        except KeyError:
+            logging.error("DECODER :: Invalid Username in Add Friend/Confirmation")
+            transmit_buffer.put([error_handler(17), addr])
+            return
+        sender_key = packet["Key"]
+        if verify_key(sender_name, sender_key, public=True)
+            transmit_buffer.put(packet)
+        else:
+            logging.error("DECODER :: Username: '" + sender_name + "' has incorrect public Key")
+            transmit_buffer.put([error_handler(4), addr])
 
     elif packet_id == 103:
         # Delete Request
