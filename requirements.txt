@@ -2,4 +2,4 @@ simplejson
 autopep8
 cryptography
 pyinstaller
-
+pyOpenSSL
