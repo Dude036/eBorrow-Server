@@ -176,6 +176,68 @@ class NetworkingTest(unittest.TestCase):
 
     def test_ownership_change(self):
         # TODO: Implement Test Here
+        header = '@' + self.test_username_1 + ':6'
+        packet = {}
+        pass
+
+    def test_recieve_messages(self):
+        # TODO: Implement Test Here
+        header = '@' + self.test_username_1 + ':7'
+        packet = {}
+        pass
+
+    def test_recieve_exchanges(self):
+        # TODO: Implement Test Here
+        header = '@' + self.test_username_1 + ':8'
+        packet = {}
+        pass
+
+    def test_clear_messages(self):
+        # TODO: Implement Test Here
+        header = '@' + self.test_username_1 + ':9'
+        packet = {}
+        pass
+
+    def test_recieve_pending_friends(self):
+        # TODO: Implement Test Here
+        header = '@' + self.test_username_1 + ':10'
+        packet = {}
+        pass
+
+    def test_recieve_pending_exchanges(self):
+        # TODO: Implement Test Here
+        header = '@' + self.test_username_1 + ':11'
+        packet = {}
+        pass
+
+    def test_exchange_request(self):
+        # TODO: Implement Test Here
+        header = '@' + self.test_username_1 + ':100'
+        packet = {}
+        pass
+
+    def test_friend_invite(self):
+        # TODO: Implement Test Here
+        header = '@' + self.test_username_1 + ':101'
+        packet = {}
+        pass
+
+    def test_add_friend(self):
+        # TODO: Implement Test Here
+        header = '@' + self.test_username_1 + ':102'
+        packet = {}
+        pass
+
+    def test_confirm_friend(self):
+        # TODO: Implement Test Here
+        header = '@' + self.test_username_1 + ':102'
+        packet = {}
+        pass
+
+    def test_delete_friend(self):
+        # TODO: Implement Test Here
+        header = '@' + self.test_username_1 + ':103'
+        packet = {}
         pass
 
     def main(self):
