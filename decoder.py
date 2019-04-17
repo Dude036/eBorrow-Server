@@ -447,7 +447,7 @@ def piped(username, packet_id, packet, addr, transmit_buffer):
         # Add Friend
         # Returns an Error Packet
         try:
-            sender_name = packet["Target"]
+            sender_name = retrieve_user(username)
             sender_key = packet["Key"]
         except KeyError:
             logging.error("DECODER :: Invalid Username in Add Friend/Confirmation")
