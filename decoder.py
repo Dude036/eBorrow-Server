@@ -29,8 +29,8 @@ def decoding(decode_buffer, transmit_buffer):
     while True:
         # Wait for the Queue to be filled. Recieves the Item and the Address
         item, addr = decode_buffer.get()
-        logging.info("DECODER :: Starting Decoding process.")
-        logging.info("DECODER :: Extracting User Information")
+        logging.debug("DECODER :: Starting Decoding process.")
+        logging.debug("DECODER :: Extracting User Information")
 
         # Split the item into Header and Packet
         match = re.match(r'([^ ]*) (.*)', item)
@@ -63,7 +63,7 @@ def decoding(decode_buffer, transmit_buffer):
 
         # Set Username
         username = header[:delimit_pos]
-        logging.debug("DECODER :: Username: %s : Connected" % username)
+        logging.info("DECODER :: Username: %s : Connected" % username)
         # Remove the '@' and remove username from the header
         username = username[1:]
         header = header[delimit_pos:]
@@ -328,7 +328,7 @@ def interpretted(username, packet_id, packet, addr, transmit_buffer):
             transmit_buffer.put([error_handler(7), addr])
             return
         if verify_key(username, user_key, public=False):
-            logging.info("DECODER :: Deleted " + username +
+            logging.debug("DECODER :: Deleted " + username +
                          "'s messages per request")
             user = retrieve_user(username)
             user.clear_messages()
@@ -347,7 +347,7 @@ def interpretted(username, packet_id, packet, addr, transmit_buffer):
             transmit_buffer.put([error_handler(7), addr])
             return
         if verify_key(username, user_key, public=False):
-            logging.info("DECODER :: ")
+            logging.debug("DECODER :: " + username + " Cleared")
             user = retrieve_user(username)
             new_header = '@' + username + ':204'
             transmit_buffer.put([new_header + ' ' + user.send_pending_friends(), addr])
@@ -365,7 +365,7 @@ def interpretted(username, packet_id, packet, addr, transmit_buffer):
             transmit_buffer.put([error_handler(7), addr])
             return
         if verify_key(username, user_key, public=False):
-            logging.info("DECODER :: ")
+            logging.debug("DECODER :: " + username + ' Cleared')
             user = retrieve_user(username)
             new_header = '@' + username + ':203'
             transmit_buffer.put([new_header + ' ' + user.send_pending_exchanges(), addr])
@@ -374,7 +374,7 @@ def interpretted(username, packet_id, packet, addr, transmit_buffer):
             transmit_buffer.put([error_handler(3), addr])
             return
 
-    logging.debug("DECODER :: Successfully decoded id: " + str(packet_id))
+    logging.info("DECODER :: Successfully decoded id: " + str(packet_id))
 
 
 def piped(username, packet_id, packet, addr, transmit_buffer):
@@ -466,6 +466,7 @@ def piped(username, packet_id, packet, addr, transmit_buffer):
     elif packet_id == 103:
         # Delete Request
         # Returns an Error Packet
+        # TODO: add functionality where this can't be spammed
         user = retrieve_user(username)
         if user is not None:
             user.Messages.append('@' + username + ':103 ' + json.dumps(packet))
@@ -474,4 +475,4 @@ def piped(username, packet_id, packet, addr, transmit_buffer):
             logging.error("DECODER :: Invalid Username for Friend Request")
             transmit_buffer.put([error_handler(17), addr])
 
-    logging.debug("DECODER :: Successfully decoded id: " + str(packet_id))
+    logging.info("DECODER :: Successfully decoded id: " + str(packet_id))
