@@ -132,7 +132,8 @@ class User(object):
             except KeyError as e:
                 logging.error("Item not in the database.")
                 logging.error(e)
-        packet = packet[:-1]
+        if packet[-1] == ',':
+            packet = packet[:-1]
         packet += '}'
 
         return header + ' ' + packet
