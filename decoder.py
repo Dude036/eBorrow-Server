@@ -428,7 +428,7 @@ def piped(username, packet_id, packet, addr, transmit_buffer):
 
     elif packet_id == 101:
         # Friend Request
-        # Pending Josh-Approval
+        # Returns an Error Packet
         try:
             sender_name = retrieve_user(username)
             receiver_name = retrieve_user(packet["Target"])
@@ -443,7 +443,7 @@ def piped(username, packet_id, packet, addr, transmit_buffer):
 
     elif packet_id == 102:
         # Add Friend
-        # Sent after confirmation is given
+        # Returns an Error Packet
         try:
             sender_name = retrieve_user(username)
             receiver_name = retrieve_user(packet["Target"])
@@ -453,7 +453,12 @@ def piped(username, packet_id, packet, addr, transmit_buffer):
             return
         sender_key = packet["Key"]
         if verify_key(sender_name, sender_key, public=True):
-            transmit_buffer.put(packet)
+            user = retrieve_user(username)
+            if user is not None:
+                user.Messages.append('@' + username + ':103 ' + json.dumps(packet))
+                transmit_buffer.put([error_handler(0), addr])
+            else:
+                transmit_buffer.put([error_handler(17), addr])
         else:
             logging.error("DECODER :: Username: '" + sender_name + "' has incorrect public Key")
             transmit_buffer.put([error_handler(4), addr])
