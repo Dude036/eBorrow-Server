@@ -245,7 +245,7 @@ class NetworkingTest(unittest.TestCase):
         self.test_create_new_user()
         input(format("Press Enter to Continue", '^100s'))
 
-        # Add all items to user 1
+        # Add all items to username_1
         self.test_add_many_db_item()
         input(format("Press Enter to Continue", '^100s'))
 
@@ -253,10 +253,17 @@ class NetworkingTest(unittest.TestCase):
         self.test_recieve_some_data()
         input(format("Press Enter to Continue", '^100s'))
 
+        # Add friends between username_1 and username_2
+        # Confirm friends between username_1 and username_2
+        # Pick an item to share and request it
+        # Create an exchange between the two
+        # Clear exchanges
+
         # Remove Items
         self.test_delete_many_db_item()
         input(format("Press Enter to Continue", '^100s'))
 
+        # Delete users
         self.test_delete_new_user()
 
 
