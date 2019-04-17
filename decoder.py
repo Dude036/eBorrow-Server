@@ -349,8 +349,9 @@ def interpretted(username, packet_id, packet, addr, transmit_buffer):
         if verify_key(username, user_key, public=False):
             logging.debug("DECODER :: " + username + " Cleared")
             user = retrieve_user(username)
-            new_header = '@' + username + ':204'
-            transmit_buffer.put([new_header + ' ' + user.send_pending_friends(), addr])
+            # new_header = '@' + username + ':204'
+            # new_header + ' ' + :: Everything before colons pulled out of transmit buffer
+            transmit_buffer.put([user.send_pending_friends(), addr])
         else:
             logging.error("DECODER :: Incorrect User private Key")
             transmit_buffer.put([error_handler(3), addr])
@@ -367,8 +368,9 @@ def interpretted(username, packet_id, packet, addr, transmit_buffer):
         if verify_key(username, user_key, public=False):
             logging.debug("DECODER :: " + username + ' Cleared')
             user = retrieve_user(username)
-            new_header = '@' + username + ':203'
-            transmit_buffer.put([new_header + ' ' + user.send_pending_exchanges(), addr])
+            # new_header = '@' + username + ':203'
+            # new_header + ' ' +  :: Everything before colons taken out of transmit buffer (double headers)
+            transmit_buffer.put([user.send_pending_exchanges(), addr])
         else:
             logging.error("DECODER :: Incorrect User private Key")
             transmit_buffer.put([error_handler(3), addr])
