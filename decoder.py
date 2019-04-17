@@ -457,6 +457,7 @@ def piped(username, packet_id, packet, addr, transmit_buffer):
             user = retrieve_user(sender_name)
             if user is not None:
                 user.Messages.append('@' + username + ':102 ' + json.dumps(packet))
+                user.to_file()
                 transmit_buffer.put([error_handler(0), addr])
             else:
                 logging.error("DECODER :: Invalid Username for Friend Request")
@@ -472,6 +473,7 @@ def piped(username, packet_id, packet, addr, transmit_buffer):
         user = retrieve_user(username)
         if user is not None:
             user.Messages.append('@' + username + ':103 ' + json.dumps(packet))
+            user.to_file()
             transmit_buffer.put([error_handler(0), addr])
         else:
             logging.error("DECODER :: Invalid Username for Friend Request")
