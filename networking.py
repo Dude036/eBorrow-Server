@@ -8,7 +8,7 @@ END_BYTE = b'\x7F\xFF\x7F\xFF'
 BUFF_SIZE = 8192
 HOST = '127.0.0.1'          # Localhost for testing
 # HOST = '172.31.38.104'	    # AWS testing
-# HOST = '24.11.13.224'	    # Accepts outside traffic !!THIS NEEDS TO STAY!!
+# HOST = '192.168.1.149'	    # Accepts outside traffic !!THIS NEEDS TO STAY!!
 PORT = 41111		        # Port to listen on (non-privileged ports are > 1023)
 mySocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 mySocket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
