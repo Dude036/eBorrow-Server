@@ -195,8 +195,18 @@ class NetworkingTest(unittest.TestCase):
     def test_clear_messages(self):
         # TODO: Implement Test Here
         header = '@' + self.test_username_1 + ':9'
-        packet = {}
-        pass
+        packet = {"Messages": -1, "private": self.private_key_1}
+        data_recv = self.send_buffer(
+            [header + ' ' + self.dictionary_to_byte_string(packet)])
+        self.assertIn('!Error:0', data_recv)
+
+        header = '@' + self.test_username_1 + ':7'
+        packet = {"Messages": 1, "private": self.private_key_1}
+        data_recv = self.send_buffer(
+            [header + ' ' + self.dictionary_to_byte_string(packet)])
+        head, pack = data_recv.split(' ')
+        self.assertEqual("@username:201", head)
+        self.assertEqual([], pack)
 
     def test_recieve_pending_friends(self):
         # TODO: Implement Test Here
