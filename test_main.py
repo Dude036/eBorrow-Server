@@ -206,7 +206,7 @@ class NetworkingTest(unittest.TestCase):
             [header + ' ' + self.dictionary_to_byte_string(packet)])
         head, pack = data_recv.split(' ')
         self.assertEqual("@username:201", head)
-        self.assertEqual([], pack)
+        self.assertEqual([], json.loads(pack))
 
     def test_recieve_pending_friends(self):
         # TODO: Implement Test Here
