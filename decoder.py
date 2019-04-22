@@ -447,23 +447,22 @@ def piped(username, packet_id, packet, addr, transmit_buffer):
         # Add Friend
         # Returns an Error Packet
         try:
-            sender_name = retrieve_user(username)
-            sender_key = packet['Key']
+            reciever = retrieve_user(packet['Target'])
         except KeyError:
             logging.error("DECODER :: Invalid Username in Add Friend/Confirmation")
             transmit_buffer.put([error_handler(17), addr])
             return
+        sender_key = packet["Key"]
         if verify_key(username, sender_key, public=True):
-            user = retrieve_user(sender_name)
-            if user is not None:
-                user.Messages.append('@' + username + ':102 ' + json.dumps(packet))
-                user.to_file()
+            receiving_user = retrieve_user(reciever)
+            if receiving_user is not None:
+                receiving_user.Messages.append('@' + username + ':102 ' + json.dumps(packet))
                 transmit_buffer.put([error_handler(0), addr])
             else:
-                logging.error("DECODER :: Invalid Username for Friend Request")
+                logging.error("DECODER :: Invalid Target Username for Friend Request")
                 transmit_buffer.put([error_handler(17), addr])
         else:
-            logging.error("DECODER :: Username has incorrect public Key")
+            logging.error("DECODER :: Username: '" + username + "' has incorrect public Key")
             transmit_buffer.put([error_handler(4), addr])
 
     elif packet_id == 103:

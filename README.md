@@ -62,7 +62,7 @@ We use GitHub's versioning system. The *master* branch is to remain untouched un
 
 * **Joshua Higham** - Backend/Networking/Security/Database
 * **Caleb Lundquist** - Frontend/User Interface
-* **Tim Weber** - Backend/Networking/Security
+* **Tim Weber** - Weaponized UML Dictator - Backend/Networking/Security
 * **Jordan Yates** - Frontend/Networking/Security
 
 ## License

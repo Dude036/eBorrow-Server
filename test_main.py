@@ -176,6 +176,78 @@ class NetworkingTest(unittest.TestCase):
 
     def test_ownership_change(self):
         # TODO: Implement Test Here
+        header = '@' + self.test_username_1 + ':6'
+        packet = {}
+        pass
+
+    def test_recieve_messages(self):
+        # TODO: Implement Test Here
+        header = '@' + self.test_username_1 + ':7'
+        packet = {}
+        pass
+
+    def test_recieve_exchanges(self):
+        # TODO: Implement Test Here
+        header = '@' + self.test_username_1 + ':8'
+        packet = {}
+        pass
+
+    def test_clear_messages(self):
+        # TODO: Implement Test Here
+        header = '@' + self.test_username_1 + ':9'
+        packet = {"Messages": -1, "private": self.private_key_1}
+        data_recv = self.send_buffer(
+            [header + ' ' + self.dictionary_to_byte_string(packet)])
+        self.assertIn('!Error:0', data_recv)
+
+        header = '@' + self.test_username_1 + ':7'
+        packet = {"Messages": 1, "private": self.private_key_1}
+        data_recv = self.send_buffer(
+            [header + ' ' + self.dictionary_to_byte_string(packet)])
+        head, pack = data_recv.split(' ')
+        self.assertEqual("@username:201", head)
+        self.assertEqual([], json.loads(pack))
+
+    def test_recieve_pending_friends(self):
+        # TODO: Implement Test Here
+        header = '@' + self.test_username_1 + ':10'
+        packet = {}
+        pass
+
+    def test_recieve_pending_exchanges(self):
+        # TODO: Implement Test Here
+        header = '@' + self.test_username_1 + ':11'
+        packet = {}
+        pass
+
+    def test_exchange_request(self):
+        # TODO: Implement Test Here
+        header = '@' + self.test_username_1 + ':100'
+        packet = {}
+        pass
+
+    def test_friend_invite(self):
+        # TODO: Implement Test Here
+        header = '@' + self.test_username_1 + ':101'
+        packet = {}
+        pass
+
+    def test_add_friend(self):
+        # TODO: Implement Test Here
+        header = '@' + self.test_username_1 + ':102'
+        packet = {}
+        pass
+
+    def test_confirm_friend(self):
+        # TODO: Implement Test Here
+        header = '@' + self.test_username_1 + ':102'
+        packet = {}
+        pass
+
+    def test_delete_friend(self):
+        # TODO: Implement Test Here
+        header = '@' + self.test_username_1 + ':103'
+        packet = {}
         pass
 
     def main(self):
@@ -183,7 +255,7 @@ class NetworkingTest(unittest.TestCase):
         self.test_create_new_user()
         input(format("Press Enter to Continue", '^100s'))
 
-        # Add all items to user 1
+        # Add all items to username_1
         self.test_add_many_db_item()
         input(format("Press Enter to Continue", '^100s'))
 
@@ -191,10 +263,17 @@ class NetworkingTest(unittest.TestCase):
         self.test_recieve_some_data()
         input(format("Press Enter to Continue", '^100s'))
 
+        # Add friends between username_1 and username_2
+        # Confirm friends between username_1 and username_2
+        # Pick an item to share and request it
+        # Create an exchange between the two
+        # Clear exchanges
+
         # Remove Items
         self.test_delete_many_db_item()
         input(format("Press Enter to Continue", '^100s'))
 
+        # Delete users
         self.test_delete_new_user()
 
 
