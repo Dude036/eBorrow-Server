@@ -163,7 +163,7 @@ These commands are only read by the server, and are stored in a buffer. Whenever
 		Header:
 			@your_username:101
 		Packet:
-			{"Target": "friends_username"}
+			{"Target": "friends_username", "Sender": "your_username"}
 			
 			
 * Add Friend / Friend Confirmation
