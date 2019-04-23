@@ -438,7 +438,7 @@ def piped(username, packet_id, packet, addr, transmit_buffer):
             logging.error("DECODER :: Invalid Username for Friend Request")
             transmit_buffer.put([error_handler(17), addr])
             return
-        new_packet = {"Target": receiver_name, "Sender": sender_name}
+        new_packet = {"Target": receiver_name.Username, "Sender": sender_name.Username}
         sender_name.add_pending_friend(json.dumps(new_packet))
         # send back the 0 error for 'all okay'
         transmit_buffer.put([error_handler(0), addr])
